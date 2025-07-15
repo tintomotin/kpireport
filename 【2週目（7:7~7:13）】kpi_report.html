@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>キャリアパスポート KPI レポート</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+            transition: background-color 0.3s;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* University Selection Screen */
+        #university-selection-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+            text-align: center;
+        }
+
+        #university-selection-screen h1 {
+            font-size: 28px;
+            color: #2c3e50;
+            margin-bottom: 40px;
+        }
+
+        .uni-select-button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .uni-select-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+         .uni-select-button:active {
+            transform: translateY(0);
+        }
+
+
+        /* Report Screen (initially hidden) */
+        #report-screen {
+            display: none;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px; /* Reduced margin */
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .logo-area {
+            display: flex;
+            flex-direction: column; /* Stack logo and university name */
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .university-name-display {
+            font-size: 18px;
+            font-weight: normal;
+            color: #555;
+            margin-top: 5px;
+        }
+
+
+        .controls-area {
+            display: flex;
+            flex-direction: column; /* Stack date selector and back button */
+            align-items: flex-end; /* Align items to the right */
+        }
+
+
+        .date-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px; /* Space before back button */
+        }
+
+        .back-to-selection-button {
+            background-color: #7f8c8d;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .back-to-selection-button:hover {
+            background-color: #6c7a7d;
+        }
+
+
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .kpi-sections-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            align-items: stretch;
+        }
+
+        .kpi-section {
+            flex: 1;
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .kpi-section h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .build-section { border: 2px solid #3498db; background-color: rgba(52, 152, 219, 0.05); }
+        .build-section h3 { color: #3498db; }
+
+        .measure-section { border: 2px solid #f39c12; background-color: rgba(243, 156, 18, 0.05); }
+        .measure-section h3 { color: #f39c12; }
+
+        .learn-section { border: 2px solid #9b59b6; background-color: rgba(155, 89, 182, 0.05); }
+        .learn-section h3 { color: #9b59b6; }
+
+        .single-column-cards {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            flex-grow: 1;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            min-height: 150px; 
+        }
+        .card.blank-card { 
+             min-height: 100px; 
+             justify-content: flex-start;
+        }
+        .card.blank-card .card-header {
+            border-bottom: none;
+        }
+        .card.blank-card .card-value-large,
+        .card.blank-card .card-subvalue,
+        .card.blank-card .progress-container {
+            display: none;
+        }
+
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .card-title { font-size: 16px; font-weight: bold; }
+        .card-value-large { font-size: 28px; font-weight: bold; margin-bottom: 5px; color: #2c3e50; }
+        .card-subvalue { font-size: 14px; color: #7f8c8d; margin-bottom: 10px; }
+        .card-subvalue .date-progress { font-size: 0.9em; color: #555; }
+
+        .progress-container { margin-top: auto; }
+        .progress-label { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 12px; }
+        .progress-bar { height: 10px; background-color: #ecf0f1; border-radius: 5px; overflow: hidden; }
+        .progress-fill { height: 100%; background-color: #3498db; }
+        .progress-fill.warning { background-color: #f39c12; }
+        .progress-fill.success { background-color: #2ecc71; }
+        .progress-fill.danger { background-color: #e74c3c; }
+
+        .charts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px; }
+        .chart { background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 15px; height: 300px; }
+
+        .action-section, .ai-analysis-section { 
+            background: white; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            padding: 20px; 
+            margin-bottom: 30px; 
+        }
+        .section-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            margin-bottom: 15px; 
+        }
+        .section-title { font-size: 18px; font-weight: bold; }
+
+        .ai-analysis-button {
+            background-color: #8e44ad;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .ai-analysis-button:hover {
+            background-color: #9b59b6;
+        }
+        .ai-analysis-button:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+        .ai-analysis-content-wrapper {
+             border: 1px solid #e0e0e0;
+             border-radius: 5px;
+             padding: 15px;
+             margin-top: 15px;
+             min-height: 150px;
+             background-color: #fdfdfd;
+        }
+        .ai-analysis-content .placeholder {
+            color: #888;
+            text-align: center;
+            padding-top: 40px;
+        }
+        .ai-analysis-content h3 { color: #8e44ad; margin-top:0;}
+        .ai-analysis-content h4 { margin-bottom: 5px; }
+        .ai-analysis-content ul, .ai-analysis-content ol { padding-left: 20px; }
+        .ai-analysis-content .loading {
+            text-align: center;
+            font-weight: bold;
+            color: #8e44ad;
+            padding: 40px 0;
+        }
+
+
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; color: white; }
+        .badge-success { background-color: #2ecc71; }
+        .badge-warning { background-color: #f39c12; }
+        .badge-danger { background-color: #e74c3c; }
+
+        .monthly-goal-container { margin-top: 30px; }
+        .goal-section { margin-bottom: 30px; }
+        .goal-title { font-size: 18px; font-weight: bold; margin-bottom: 15px; }
+        .goal-progress { display: flex; align-items: center; gap: 15px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 15px; margin-bottom: 15px; }
+        .goal-value { font-size: 24px; font-weight: bold; min-width: 120px; }
+        .goal-progress-bar { flex-grow: 1; }
+        .goal-target { font-size: 16px; min-width: 100px; text-align: right; }
+        .goal-target .date-progress { display: block; font-size: 0.9em; color: #555; margin-top: 4px; }
+        .goal-breakdown { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
+
+
+        canvas { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #f8f9fa; font-weight: bold; }
+        tr:hover { background-color: #f1f1f1; }
+
+        .status-achieved { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; color: white; background-color: #2ecc71; }
+        .status-not-achieved { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; color: white; background-color: #e74c3c; }
+        .progress-value { font-weight: bold; text-align: center; }
+
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .kpi-sections-container { flex-direction: column; }
+        }
+        @media (max-width: 768px) {
+            .summary-cards, .large-summary-cards, .charts-grid, .goal-breakdown { grid-template-columns: 1fr; }
+            .header { flex-direction: column; align-items: stretch; } 
+            .logo-area { align-items: flex-start; margin-bottom:15px; }
+            .controls-area { align-items: stretch; width:100%;} 
+            .date-selector { flex-direction: column; width: 100%; gap: 10px; }
+            .date-selector div { width: 100%; }
+            .date-selector select, .date-selector input { width: 100%; box-sizing: border-box; }
+            .back-to-selection-button { width: 100%; margin-top:10px; text-align:center; } 
+            .chart { height: 250px; }
+            .goal-progress { flex-direction: column; align-items: flex-start; }
+            .goal-value, .goal-target { min-width: auto; text-align: left; }
+        }
+        @media (max-width: 480px) {
+            #university-selection-screen h1 { font-size: 22px; }
+            .uni-select-button { font-size: 16px; padding: 12px 25px; }
+            .card-value-large { font-size: 24px; }
+            .logo { font-size: 20px; }
+            .university-name-display { font-size: 16px; }
+            .section-title, .goal-title { font-size: 16px; }
+            th, td { padding: 8px 10px; font-size: 12px; }
+            .card-title { font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- University Selection Screen -->
+        <div id="university-selection-screen">
+            <h1>表示する機関を選んでください</h1>
+            <button class="uni-select-button" data-university="chiba">千葉工業大学</button>
+            <button class="uni-select-button" data-university="global_career">グローバル情報キャリア学院</button>
+            <button class="uni-select-button" data-university="seijo_gakuen">成城学園（高等部）</button>
+            <button class="uni-select-button" data-university="sparta_eikaiwa">スパルタ英会話</button>
+        </div>
+
+        <!-- Report Screen (initially hidden) -->
+        <div id="report-screen">
+            <div class="header">
+                <div class="logo-area">
+                    <div class="logo">キャリアパスポート KPI レポート</div>
+                    <div id="university-name-display" class="university-name-display"></div>
+                </div>
+                <div class="controls-area">
+                    <div class="date-selector">
+                        <div>
+                            <label for="report-type">レポートタイプ:</label>
+                            <select id="report-type">
+                                <option value="weekly">週次</option>
+                                <option value="monthly">月次</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="report-date">日付:</label>
+                            <input type="date" id="report-date" value="2025-07-14">
+                        </div>
+                    </div>
+                    <button id="back-to-selection" class="back-to-selection-button">機関選択に戻る</button>
+                </div>
+            </div>
+
+            <!-- Weekly View Content -->
+            <div class="tab-content" id="weekly-view">
+                <h2 id="weekly-view-title">週次 KPI ダッシュボード</h2>
+                <div class="kpi-sections-container">
+                    <div class="kpi-section build-section"><h3>Bizチーム</h3><div class="single-column-cards"><div class="card" id="weekly-build-package"></div></div></div>
+                    <div class="kpi-section measure-section"><h3>Measure</h3><div class="single-column-cards"><div class="card" id="weekly-measure-certs"></div></div></div>
+                    <div class="kpi-section learn-section"><h3>Learn</h3><div class="single-column-cards"><div class="card" id="weekly-learn-agent"></div><div class="card" id="weekly-learn-ai"></div><div class="card" id="weekly-learn-inasaka"></div><div class="card" id="weekly-learn-lounge"></div><div class="card" id="weekly-learn-opencampus"></div><div class="card" id="weekly-learn-assistant"></div></div></div>
+                </div>
+                <div class="charts-grid" id="weekly-charts-grid"></div>
+                <div class="action-section" id="weekly-action-section"></div>
+                <div class="ai-analysis-section">
+                    <div class="section-header">
+                        <h3 class="section-title">AIによるKPI分析</h3>
+                        <button class="ai-analysis-button" id="weekly-ai-button">分析実行</button>
+                    </div>
+                    <div class="ai-analysis-content-wrapper">
+                        <div class="ai-analysis-content" id="weekly-ai-analysis-content">
+                            <p class="placeholder">「分析実行」ボタンをクリックすると、このレポートの要約と改善案がここに表示されます。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monthly View Content -->
+            <div class="tab-content" id="monthly-view">
+                <h2 id="monthly-view-title">月次 KPI ダッシュボード</h2>
+                <div class="kpi-sections-container">
+                       <div class="kpi-section build-section"><h3>Bizチーム</h3><div class="single-column-cards"><div class="card" id="monthly-build-package"></div></div></div>
+                       <div class="kpi-section measure-section"><h3>Measure</h3><div class="single-column-cards"><div class="card" id="monthly-measure-certs"></div></div></div>
+                       <div class="kpi-section learn-section"><h3>Learn</h3><div class="single-column-cards"><div class="card" id="monthly-learn-agent"></div><div class="card" id="monthly-learn-ai"></div><div class="card" id="monthly-learn-inasaka"></div><div class="card" id="monthly-learn-lounge"></div><div class="card" id="monthly-learn-opencampus"></div><div class="card" id="monthly-learn-assistant"></div></div></div>
+                </div>
+                <div class="monthly-goal-container" id="monthly-goal-container"></div>
+                <div class="charts-grid" id="monthly-charts-grid"></div>
+                <div class="action-section" id="monthly-action-section"></div>
+                <div class="ai-analysis-section">
+                    <div class="section-header">
+                        <h3 class="section-title">AIによるKPI分析</h3>
+                        <button class="ai-analysis-button" id="monthly-ai-button">分析実行</button>
+                    </div>
+                    <div class="ai-analysis-content-wrapper">
+                        <div class="ai-analysis-content" id="monthly-ai-analysis-content">
+                            <p class="placeholder">「分析実行」ボタンをクリックすると、このレポートの要約と改善案がここに表示されます。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Data for Universities ---
+        const universityDataStore = {
+            'chiba': {
+                name: '千葉工業大学',
+                weekly: {
+                    title: '週次 KPI ダッシュボード (2025年7月第2週: 7/7~7/13)',
+                    buildPackage: { title: 'Bizチーム: パッケージ化', badge: 'やや遅れ', badgeClass: 'badge-warning', value: '0件', subValue: '前週比: 0件 (0.0%)', progressHidden: true },
+                    measureCerts: { title: 'Measure: 証明書発行数', value: '181枚', subValue: '前週比: +168枚 (+1300%)', goalProgress: '42.8%', goalTarget: '10000枚 (7月末)', progressPercent: '42.8%', progressClass: 'danger' },
+                    learnAgent: { title: 'Learn: AI講師（キャリアエージェント）', badge: null, badgeClass: null, value: '1人', subValue: '前週比: -1人 (-50.0%)', progressHidden: true },
+                    learnAi: { title: 'Learn: AI講師（web3+AI概論）', value: '21回', subValue: '前週比: -1回 (-4.5%)', progressHidden: true },
+                    learnInasaka: { title: 'Learn: AI講師（稲坂研究室）', value: '0人', subValue: '前週比: 0人 (0.0%)', progressHidden: true },
+                    learnLounge: { title: 'Learn: AI講師（グローバルラウンジ）', value: '0人', subValue: '前週比: -1人 (-100.0%)', progressHidden: true },
+                    actionTable: [],
+                    charts: {
+                        package: { id: 'package-weekly-chart', data: [0, 0, 0, 0], labels: ['第3週(6/16~22)', '第4週(6/23~29)', '第1週(7/1~6)', '第2週(7/7~13)'], color: '#3498db', title: 'パッケージ化 週次推移' },
+                        certs: { id: 'certs-weekly-chart', data: [190, 104, 13, 181], labels: ['第3週(6/16~22)', '第4週(6/23~29)', '第1週(7/1~6)', '第2週(7/7~13)'], color: '#f39c12', title: '証明書発行数 週次推移' },
+                        users: { id: 'users-weekly-chart', data: [12, 3, 2, 1], labels: ['第3週(6/16~22)', '第4週(6/23~29)', '第1週(7/1~6)', '第2週(7/7~13)'], color: '#9b59b6', title: 'AI講師（キャリアエージェント） 活用数 週次推移' },
+                        ai: { id: 'ai-teacher-weekly-chart', data: [21, 19, 22, 21], labels: ['第3週(6/16~22)', '第4週(6/23~29)', '第1週(7/1~6)', '第2週(7/7~13)'], color: '#e74c3c', title: 'AI講師（web3+AI概論）活用数 週次推移' },
+                        inasaka: { id: 'inasaka-weekly-chart', data: [0, 0, 0, 0], labels: ['第3週(6/16~22)', '第4週(6/23~29)', '第1週(7/1~6)', '第2週(7/7~13)'], color: '#1abc9c', title: 'AI講師（稲坂研究室） 活用数 週次推移' },
+                        lounge: { id: 'lounge-weekly-chart', data: [0, 0, 1, 0], labels: ['第3週(6/16~22)', '第4週(6/23~29)', '第1週(7/1~6)', '第2週(7/7~13)'], color: '#34495e', title: 'AI講師（グローバルラウンジ） 活用数 週次推移' }
+                    }
+                },
+                monthly: {
+                    title: '月次 KPI ダッシュボード (2025年7月)',
+                    buildPackage: { title: 'Bizチーム: パッケージ化', badge: 'やや遅れ', badgeClass: 'badge-warning', value: '0件', subValue: '前月比: -3件 (-100.0%)', goalProgress: '0%', goalTarget: '3件', progressPercent: '0%', progressClass: 'danger' },
+                    measureCerts: { title: 'Measure: 証明書発行数', value: '194枚', subValue: '前月比: -753枚 (-79.5%)', goalProgress: '42.8%', goalTarget: '10000枚 (7月末)', progressPercent: '42.8%', progressClass: 'danger' },
+                    learnAgent: { title: 'Learn: AI講師（キャリアエージェント）', badge: null, badgeClass: null, value: '3人', subValue: '前月比: -27人 (-90.0%)', progressHidden: true },
+                    learnAi: { title: 'Learn: AI講師（web3+AI概論）', value: '43回', subValue: '前月比: -45回 (-51.1%)', progressHidden: true },
+                    learnInasaka: { title: 'Learn: AI講師（稲坂研究室）', value: '0人', subValue: '前月比: 0人 (0.0%)', progressHidden: true },
+                    learnLounge: { title: 'Learn: AI講師（グローバルラウンジ）', value: '1人', subValue: '前月比: +1人 (+∞%)', progressHidden: true },
+                    goalContainerHTML: `
+                        <div class="goal-section">
+                            <div class="goal-title">7月末目標進捗（事業効果: 1,000万円）</div>
+                            <div class="goal-progress">
+                                <div class="goal-value">57.5%</div> 
+                                <div class="goal-progress-bar"> <div class="progress-bar"> <div class="progress-fill" style="width: 57.5%; background-color: #f39c12;"></div> </div> </div>
+                                <div class="goal-target">現状: 575.25万円 <span class="date-progress">(日程消化率: 86.1%)</span></div>
+                            </div>
+                            <div class="goal-breakdown">
+                                <div class="card"> <div class="card-header"> <div class="card-title">Measure 事業効果</div> </div> <div class="card-value-large">213.8万円</div> <div class="card-subvalue">目標: 1500万円（14.3%） <span class="date-progress">(日程消化率: 86.1%)</span></div> <div class="progress-container"> <div class="progress-bar"> <div class="progress-fill" style="width: 14.3%; background-color: #e74c3c;"></div> </div> </div> <div style="margin-top: 10px; text-align: right; font-size: 14px; color: #666;"> 実績総数: 4,276件 </div> </div>
+                                <div class="card"> <div class="card-header"> <div class="card-title">Learn 事業効果</div> </div> <div class="card-value-large">361.45万円</div> <div class="card-subvalue">目標: 350万円（103.3%） <span class="date-progress">(日程消化率: 86.1%)</span></div> <div class="progress-container"> <div class="progress-bar"> <div class="progress-fill" style="width: 100%; background-color: #2ecc71;"></div> </div> </div> <div style="margin-top: 10px; text-align: right; font-size: 14px; color: #666;"> 実績総数（AI講師（キャリアエージェント））: 184回<br> 実績総数（AI講師（web3+AI概論））: 243回<br>実績総数（AI講師（稲坂研究室））: 0回<br>実績総数（AI講師（グローバルラウンジ））: 1回 </div> </div>
+                            </div>
+                        </div>
+                        <div class="goal-section"> <div class="goal-title">年間目標進捗（事業効果: 3,000万円）</div> <div class="goal-progress"> <div class="goal-value">19.2%</div> <div class="goal-progress-bar"> <div class="progress-bar"> <div class="progress-fill" style="width: 19.2%; background-color: #e74c3c;"></div> </div> </div> <div class="goal-target">現状: 575.25万円 <span class="date-progress">(日程消化率: 28.8%)</span></div> </div> </div>
+                        <div class="goal-section"> <div class="goal-title">月別 事業効果推移</div> <table style="width: 100%; margin-top: 15px; border-collapse: collapse;"><thead><tr><th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd; background-color: #f8f9fa;">項目</th><th style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd; background-color: #f8f9fa;">4月</th><th style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd; background-color: #f8f9fa;">5月</th><th style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd; background-color: #f8f9fa;">6月</th><th style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd; background-color: #f8f9fa;">7月</th><th style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd; background-color: #f8f9fa;">累計</th></tr></thead><tbody><tr><td style="padding: 10px; border-bottom: 1px solid #ddd;">Measure 事業効果</td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd;">43.2万円</td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd;">54.15万円</td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd;">47.35万円</td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd;">9.7万円</td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd; font-weight: bold;">213.8万円</td></tr><tr><td style="padding: 10px; border-bottom: 1px solid #ddd;">Learn 事業効果</td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd;">159.25万円</td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd;">103.8万円</td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd;">65.7万円</td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd;">12.2万円</td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd; font-weight: bold;">361.45万円</td></tr><tr><td style="padding: 10px; border-bottom: 1px solid #ddd; padding-left: 30px; color: #9b59b6;"><span style="font-size: 0.9em;">└ AI講師（キャリアエージェント）</span></td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd; color: #9b59b6;">154.0万円</td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd;">89.25万円</td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd;">52.5万円</td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd;">5.25万円</td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd; font-weight: bold;">322.0万円</td></tr><tr><td style="padding: 10px; border-bottom: 1px solid #ddd; padding-left: 30px; color: #9b59b6;"><span style="font-size: 0.9em;">└ AI講師（web3+AI概論）</span></td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd; color: #9b59b6;">5.25万円</td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd;">14.55万円</td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd;">13.2万円</td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd;">6.45万円</td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd; font-weight: bold;">39.45万円</td></tr><tr><td style="padding: 10px; border-bottom: 1px solid #ddd; padding-left: 30px; color: #9b59b6;"><span style="font-size: 0.9em;">└ AI講師（稲坂研究室）</span></td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd; color: #9b59b6;">0.0万円</td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd;">0.0万円</td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd;">0.0万円</td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd;">0.0万円</td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd; font-weight: bold;">0.0万円</td></tr><tr><td style="padding: 10px; border-bottom: 1px solid #ddd; padding-left: 30px; color: #9b59b6;"><span style="font-size: 0.9em;">└ AI講師（グローバルラウンジ）</span></td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd; color: #9b59b6;">0.0万円</td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd;">0.0万円</td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd;">0.0万円</td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd;">0.5万円</td><td style="padding: 10px; text-align: right; border-bottom: 1px solid #ddd; font-weight: bold;">0.5万円</td></tr><tr><td style="padding: 10px; font-weight: bold; border-bottom: 1px solid #ddd;">合計</td><td style="padding: 10px; text-align: right; font-weight: bold; border-bottom: 1px solid #ddd;">202.45万円</td><td style="padding: 10px; text-align: right; font-weight: bold; border-bottom: 1px solid #ddd;">157.95万円</td><td style="padding: 10px; text-align: right; font-weight: bold; border-bottom: 1px solid #ddd;">113.05万円</td><td style="padding: 10px; text-align: right; font-weight: bold; border-bottom: 1px solid #ddd;">21.9万円</td><td style="padding: 10px; text-align: right; font-weight: bold; border-bottom: 1px solid #ddd;">575.25万円</td></tr></tbody></table></div>`,
+                    actionTable: [],
+                    charts: {
+                        package: { id: 'package-monthly-chart', data: [0, 0, 0, 0], labels: ['4月', '5月', '6月', '7月'], color: '#3498db', title: 'パッケージ化 月次推移', goal: 3 },
+                        certs: { id: 'certs-monthly-chart', data: [864, 1083, 947, 194], labels: ['4月', '5月', '6月', '7月'], color: '#f39c12', title: '証明書発行数 月次推移' },
+                        users: { id: 'users-monthly-chart', data: [88, 51, 30, 3], labels: ['4月', '5月', '6月', '7月'], color: '#9b59b6', title: 'AI講師（キャリアエージェント） 活用数 月次推移' },
+                        ai: { id: 'ai-teacher-monthly-chart', data: [35, 97, 88, 43], labels: ['4月', '5月', '6月', '7月'], color: '#e74c3c', title: 'AI講師（web3+AI概論）活用数 月次推移' },
+                        inasaka: { id: 'inasaka-monthly-chart', data: [0, 0, 0, 0], labels: ['4月', '5月', '6月', '7月'], color: '#1abc9c', title: 'AI講師（稲坂研究室） 活用数 月次推移' },
+                        lounge: { id: 'lounge-monthly-chart', data: [0, 0, 0, 1], labels: ['4月', '5月', '6月', '7月'], color: '#34495e', title: 'AI講師（グローバルラウンジ） 活用数 月次推移' }
+                    }
+                }
+            },
+            'global_career': { 
+                name: 'グローバル情報キャリア学院', 
+                weekly: {
+                    title: '週次 KPI ダッシュボード (2025年7月第2週: 7/7~7/13)',
+                    measureCerts: { title: 'Measure: 証明書発行数', value: '45人', subValue: '前週比: -52人 (-53.6%)', progressHidden: true },
+                    learnAi: { title: 'Learn: AI講師（リーンキャリアデザイン）', value: '5回', subValue: '前週比: -1回 (-16.7%)', progressHidden: true},
+                    actionTable: [], 
+                    charts: { 
+                        certs: { id: 'certs-weekly-chart-gic', data: [46, 0, 97, 45], labels: ['第3週(6/16~22)', '第4週(6/23~29)', '第1週(7/1~6)', '第2週(7/7~13)'], color: '#f39c12', title: '証明書発行数 週次' }, 
+                        ai: { id: 'ai-teacher-weekly-chart-gic', data: [18, 19, 6, 5], labels: ['第3週(6/16~22)', '第4週(6/23~29)', '第1週(7/1~6)', '第2週(7/7~13)'], color: '#e74c3c', title: 'AI講師（リーンキャリアデザイン）活用数 週次' } 
+                    }
+                },
+                monthly: {
+                    title: '月次 KPI ダッシュボード (2025年7月)',
+                    measureCerts: { title: 'Measure: 証明書発行数', value: '142件', subValue: '前月比: +1件 (+0.7%)', progressHidden: true }, 
+                    learnAi: { title: 'Learn: AI講師（リーンキャリアデザイン）', value: '11回', subValue: '前月比: -73回 (-86.9%)', progressHidden: true }, 
+                    goalContainerHTML: `
+                        <div class="goal-section">
+                            <div class="goal-title">7月末目標進捗（事業効果: 16万円）</div>
+                            <div class="goal-progress">
+                                <div class="goal-value">212.8%</div> 
+                                <div class="goal-progress-bar"> <div class="progress-bar"> <div class="progress-fill success" style="width: 100%;"></div> </div> </div>
+                                <div class="goal-target">現状: 34.05万円 <span class="date-progress">(日程消化率: 86.1%)</span></div>
+                            </div>
+                            <div class="goal-breakdown">
+                                <div class="card">
+                                    <div class="card-header"> <div class="card-title">Measure 事業効果</div> </div>
+                                    <div class="card-value-large">0万円</div>
+                                    <div class="card-subvalue">目標: 0万円（-） <span class="date-progress">(日程消化率: 86.1%)</span></div>
+                                    <div class="progress-container"> <div class="progress-bar"> <div class="progress-fill" style="width: 0%;"></div> </div> </div>
+                                    <div style="margin-top: 10px; text-align: right; font-size: 14px; color: #666;">
+                                        実績総数: 495件
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-header"> <div class="card-title">Learn 事業効果</div> </div>
+                                    <div class="card-value-large">34.05万円</div>
+                                    <div class="card-subvalue">目標: 16万円（212.8%） <span class="date-progress">(日程消化率: 86.1%)</span></div>
+                                    <div class="progress-container"> <div class="progress-bar"> <div class="progress-fill success" style="width: 100%;"></div> </div> </div>
+                                    <div style="margin-top: 10px; text-align: right; font-size: 14px; color: #666;">
+                                        実績総数（Learn: AI講師（リーンキャリアデザイン）活用数）: 227回
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="goal-section">
+                            <div class="goal-title">年間目標進捗（事業効果: 48万円）</div>
+                            <div class="goal-progress">
+                                <div class="goal-value">70.9%</div>
+                                <div class="goal-progress-bar"> <div class="progress-bar"> <div class="progress-fill warning" style="width: 70.9%;"></div> </div> </div>
+                                <div class="goal-target">現状: 34.05万円 <span class="date-progress">(日程消化率: 28.8%)</span></div>
+                            </div>
+                        </div>`, 
+                    actionTable: [], 
+                    charts: { 
+                        certs: { id: 'certs-monthly-chart-gic', data: [73, 184, 141, 142], labels: ['4月', '5月', '6月', '7月'], color: '#f39c12', title: '証明書発行数 月次', note: 'GIC学院データ' }, 
+                        ai: { id: 'ai-teacher-monthly-chart-gic', data: [35, 97, 84, 11], labels: ['4月', '5月', '6月', '7月'], color: '#e74c3c', title: 'AI講師（リーンキャリアデザイン）活用数 月次', note: 'GIC学院データ' } 
+                    }
+                }
+            },
+             'seijo_gakuen': {
+                name: '成城学園（高等部）',
+                weekly: { 
+                    title: '週次 KPI ダッシュボード (2025年7月第2週: 7/7~7/13)',
+                    measureCerts: { title: 'Measure: 証明書発行数', value: '361人', subValue: '前週比: +361人 (+∞%)', progressHidden: true },
+                    learnOpenCampus: { title: 'Learn: AI講師（オープンキャンパス選定）', value: '10回', subValue: '前週比: +10回 (+∞%)', progressHidden: true},
+                    learnAssistant: { title: 'Learn: AI助手（学生面談サポート）', value: '1回', subValue: '前週比: +1回 (+∞%)', progressHidden: true},
+                    actionTable: [], 
+                    charts: { 
+                        certs: { id: 'certs-weekly-chart-seijo', data: [0, 0, 0, 361], labels: ['第3週(6/16~22)', '第4週(6/23~29)', '第1週(7/1~6)', '第2週(7/7~13)'], color: '#f39c12', title: '証明書発行数 週次' }, 
+                        opencampus: { id: 'opencampus-weekly-chart-seijo', data: [0, 0, 0, 10], labels: ['第3週(6/16~22)', '第4週(6/23~29)', '第1週(7/1~6)', '第2週(7/7~13)'], color: '#e74c3c', title: 'AI講師（オープンキャンパス選定）活用数 週次' },
+                        assistant: { id: 'assistant-weekly-chart-seijo', data: [0, 0, 0, 1], labels: ['第3週(6/16~22)', '第4週(6/23~29)', '第1週(7/1~6)', '第2週(7/7~13)'], color: '#9b59b6', title: 'AI助手（学生面談サポート）活用数 週次' }
+                    }
+                },
+                monthly: { 
+                    title: '月次 KPI ダッシュボード (2025年7月)',
+                    measureCerts: { title: 'Measure: 証明書発行数', value: '361件', subValue: '前月比: +361件 (+∞%)', progressHidden: true }, 
+                    learnOpenCampus: { title: 'Learn: AI講師（オープンキャンパス選定）', value: '10回', subValue: '前月比: +10回 (+∞%)', progressHidden: true }, 
+                    learnAssistant: { title: 'Learn: AI助手（学生面談サポート）', value: '1回', subValue: '前月比: +1回 (+∞%)', progressHidden: true }, 
+                    goalContainerHTML: `
+                        <div class="goal-section">
+                            <div class="goal-title">7月末目標進捗（事業効果）</div>
+                            <div class="goal-progress">
+                                <div class="goal-value">16,500円</div>
+                                <div class="goal-progress-bar"></div>
+                                <div class="goal-target"></div>
+                            </div>
+                        </div>`, 
+                    actionTable: [], 
+                    charts: { 
+                        certs: { id: 'certs-monthly-chart-seijo', data: [0, 0, 0, 361], labels: ['4月', '5月', '6月', '7月'], color: '#f39c12', title: '証明書発行数 月次', note: '成城学園データ' }, 
+                        opencampus: { id: 'opencampus-monthly-chart-seijo', data: [0, 0, 0, 10], labels: ['4月', '5月', '6月', '7月'], color: '#e74c3c', title: 'AI講師（オープンキャンパス選定）活用数 月次', note: '成城学園データ' },
+                        assistant: { id: 'assistant-monthly-chart-seijo', data: [0, 0, 0, 1], labels: ['4月', '5月', '6月', '7月'], color: '#9b59b6', title: 'AI助手（学生面談サポート）活用数 月次', note: '成城学園データ' }
+                    }
+                }
+            },
+            'sparta_eikaiwa': {
+                name: 'スパルタ英会話',
+                weekly: { 
+                    title: '週次 KPI ダッシュボード (2025年7月第2週: 7/7~7/13)',
+                    measureCerts: { title: 'Measure: 証明書発行数', value: '6人', subValue: '前週比: +6人 (+∞%)', progressHidden: true },
+                    learnAi: { title: 'Learn: AI講師（スパルタ英会話）', value: '1回', subValue: '前週比: +1回 (+∞%)', progressHidden: true},
+                    actionTable: [], 
+                    charts: { 
+                        certs: { id: 'certs-weekly-chart-sparta', data: [0, 0, 0, 6], labels: ['第3週(6/16~22)', '第4週(6/23~29)', '第1週(7/1~6)', '第2週(7/7~13)'], color: '#f39c12', title: '証明書発行数 週次' }, 
+                        ai: { id: 'ai-teacher-weekly-chart-sparta', data: [0, 0, 0, 1], labels: ['第3週(6/16~22)', '第4週(6/23~29)', '第1週(7/1~6)', '第2週(7/7~13)'], color: '#e74c3c', title: 'AI講師（スパルタ英会話）活用数 週次' } 
+                    }
+                },
+                monthly: { 
+                    title: '月次 KPI ダッシュボード (2025年7月)',
+                    measureCerts: { title: 'Measure: 証明書発行数', value: '6件', subValue: '前月比: +6件 (+∞%)', progressHidden: true }, 
+                    learnAi: { title: 'Learn: AI講師（スパルタ英会話）', value: '1回', subValue: '前月比: +1回 (+∞%)', progressHidden: true }, 
+                    goalContainerHTML: `
+                        <div class="goal-section">
+                            <div class="goal-title">7月末目標進捗（事業効果）</div>
+                            <div class="goal-progress">
+                                <div class="goal-value">5,000円</div>
+                                <div class="goal-progress-bar"></div>
+                                <div class="goal-target"></div>
+                            </div>
+                        </div>`, 
+                    actionTable: [], 
+                    charts: { 
+                        certs: { id: 'certs-monthly-chart-sparta', data: [0, 0, 0, 6], labels: ['4月', '5月', '6月', '7月'], color: '#f39c12', title: '証明書発行数 月次', note: 'スパルタ英会話データ' }, 
+                        ai: { id: 'ai-teacher-monthly-chart-sparta', data: [0, 0, 0, 1], labels: ['4月', '5月', '6月', '7月'], color: '#e74c3c', title: 'AI講師（スパルタ英会話）活用数 月次', note: 'スパルタ英会話データ' } 
+                    }
+                }
+            }
+        };
+
+        let currentUniversityKey = null;
+        let isAnalyzing = false;
+
+        const universitySelectionScreen = document.getElementById('university-selection-screen');
+        const reportScreen = document.getElementById('report-screen');
+        const universityNameDisplay = document.getElementById('university-name-display');
+        const reportTypeSelect = document.getElementById('report-type');
+        const reportDateInput = document.getElementById('report-date');
+        const weeklyView = document.getElementById('weekly-view');
+        const monthlyView = document.getElementById('monthly-view');
+        const backToSelectionButton = document.getElementById('back-to-selection');
+        const uniSelectButtons = document.querySelectorAll('.uni-select-button');
+
+        function showUniversitySelectionScreen() {
+            universitySelectionScreen.style.display = 'flex';
+            reportScreen.style.display = 'none';
+            document.body.style.backgroundColor = '#f5f5f5'; 
+        }
+
+        function showReportScreen(universityKey) {
+            currentUniversityKey = universityKey;
+            const uniData = universityDataStore[currentUniversityKey];
+            universityNameDisplay.textContent = uniData.name;
+            universitySelectionScreen.style.display = 'none';
+            reportScreen.style.display = 'block';
+            document.body.style.backgroundColor = '#fff'; 
+            reportTypeSelect.value = 'weekly'; 
+            renderReportView();
+        }
+
+        function createCardHTML(data) {
+            if (!data) return ''; 
+            
+            let cardClasses = "card";
+            if (currentUniversityKey === 'global_career' && data.isBlankGIC) {
+                cardClasses += " blank-card";
+            }
+
+            let badgeHTML = '';
+            if (data.badge && data.badgeClass) {
+                badgeHTML = `<div class="badge ${data.badgeClass}">${data.badge}</div>`;
+            }
+
+            let progressHTML = '';
+            if (!data.progressHidden && data.goalProgress && data.goalTarget) {
+                progressHTML = `
+                    <div class="progress-container">
+                        <div class="progress-label">
+                            <span>${data.goalProgressType || '目標達成率'}</span>
+                            <span>${data.goalProgress} (目標: ${data.goalTarget})</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill ${data.progressClass || ''}" style="width: ${data.progressPercent || '0%'}"></div>
+                        </div>
+                    </div>`;
+            }
+            
+            if (currentUniversityKey === 'chiba' && data.title === 'Measure: 証明書発行数' && data.goalTarget && data.goalTarget.includes("7月末")) {
+                 progressHTML = `
+                    <div class="progress-container">
+                        <div class="progress-label">
+                            <span>7月末目標達成率</span>
+                            <span>${data.goalProgress} (目標: ${data.goalTarget})</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill ${data.progressClass || ''}" style="width: ${data.progressPercent || '0%'}"></div>
+                        </div>
+                    </div>`;
+            }
+            
+            let titleHTML = data.title || '';
+            if (currentUniversityKey === 'global_career' && data.isBlankGIC && (!data.title || !data.title.trim())) {
+                titleHTML = '&nbsp;'; 
+            }
+
+            return `
+                <div class="card-header">
+                    <div class="card-title">${titleHTML}</div>
+                    ${badgeHTML}
+                </div>
+                <div class="card-value-large">${data.value || ''}</div>
+                <div class="card-subvalue">${data.subValue || ''}</div>
+                ${progressHTML}
+            `;
+        }
+        
+        async function getAiAnalysis() {
+            if(isAnalyzing) return;
+            isAnalyzing = true;
+
+            const reportType = reportTypeSelect.value;
+            const uniData = universityDataStore[currentUniversityKey];
+            const data = uniData[reportType];
+            
+            const analysisContent = document.getElementById(`${reportType}-ai-analysis-content`);
+            const analysisButton = document.getElementById(`${reportType}-ai-button`);
+            
+            analysisButton.disabled = true;
+            analysisContent.innerHTML = `<div class="loading">AIが分析中です...</div>`;
+
+            let kpiDetails = ``;
+            if(data.buildPackage) kpiDetails += `- Bizチーム パッケージ化: ${data.buildPackage.value} (${data.buildPackage.subValue})\n`;
+            if(data.measureCerts) kpiDetails += `- Measure: 証明書発行数: ${data.measureCerts.value} (${data.measureCerts.subValue})\n`;
+            if(data.learnAgent) kpiDetails += `- Learn: AI講師（キャリアエージェント）: ${data.learnAgent.value} (${data.learnAgent.subValue})\n`;
+            if(data.learnAi) kpiDetails += `- Learn: AI講師（web3+AI概論）: ${data.learnAi.value} (${data.learnAi.subValue})\n`;
+            if(data.learnInasaka) kpiDetails += `- Learn: AI講師（稲坂研究室）: ${data.learnInasaka.value} (${data.learnInasaka.subValue})\n`;
+            if(data.learnLounge) kpiDetails += `- Learn: AI講師（グローバルラウンジ）: ${data.learnLounge.value} (${data.learnLounge.subValue})\n`;
+            if(data.learnOpenCampus) kpiDetails += `- Learn: AI講師（オープンキャンパス選定）: ${data.learnOpenCampus.value} (${data.learnOpenCampus.subValue})\n`;
+            if(data.learnAssistant) kpiDetails += `- Learn: AI助手（学生面談サポート）: ${data.learnAssistant.value} (${data.learnAssistant.subValue})\n`;
+            
+            if (reportType === 'monthly') {
+                kpiDetails += `\n**目標進捗**\n${document.getElementById('monthly-goal-container').innerText}`;
+            }
+
+            const prompt = `
+# KPIレポート分析依頼
+
+あなたはプロの経営コンサルタントです。以下のKPIデータに基づいて、現状の強みと弱みを分析し、具体的な改善アクションを3つ提案してください。
+
+## 基本情報
+- 大学名: ${uniData.name}
+- レポート種別: ${reportType === 'weekly' ? '週次' : '月次'}
+- レポート期間: ${data.title}
+
+## KPIデータ
+${kpiDetails}
+
+## 分析と提案
+上記のデータを基に、以下の形式で分析結果とアクションプランを生成してください。出力は日本語のMarkdown形式で、見出しと箇条書きを適切に使用してください。
+
+### 現状分析
+**強み:**
+* (ここに強みを箇条書きで記述)
+
+**弱み:**
+* (ここに弱みを箇条書きで記述)
+
+### アクションプラン
+1. **(アクションプラン1のタイトル):** (具体的な説明)
+2. **(アクションプラン2のタイトル):** (具体的な説明)
+3. **(アクションプラン3のタイトル):** (具体的な説明)
+`;
+
+            try {
+                let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                const payload = { contents: chatHistory };
+                const apiKey = ""; 
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorBody = await response.text();
+                    throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorBody}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    let text = result.candidates[0].content.parts[0].text;
+                    text = text.replace(/### (.*)/g, '<h3>$1</h3>');
+                    text = text.replace(/## (.*)/g, '<h2>$1</h2>');
+                    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                    text = text.replace(/^\* (.*$)/gm, '<li>$1</li>');
+                    text = text.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+                    text = text.replace(/<\/ul>\s*<ul>/g, '');
+                    text = text.replace(/^\d+\. (.*$)/gm, (match, p1) => `<li>${p1.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</li>`);
+                    text = text.replace(/(<li>.*<\/li>)/s, '<ol>$1</ol>');
+                     text = text.replace(/<\/ol>\s*<ol>/g, '');
+
+                    analysisContent.innerHTML = text;
+                } else {
+                   analysisContent.innerHTML = `<p>AIからの有効な分析結果を取得できませんでした。レスポンスデータ: ${JSON.stringify(result)}</p>`;
+                }
+            } catch (error) {
+                console.error("Error calling Gemini API:", error);
+                analysisContent.innerHTML = `<p>分析中にエラーが発生しました。しばらくしてから再度お試しください。<br>${error.message}</p>`;
+            } finally {
+                isAnalyzing = false;
+                analysisButton.disabled = false;
+            }
+        }
+
+
+        function createActionTableHTML(actions) {
+            if (!actions || actions.length === 0) {
+                return `<div class="section-header"> <div class="section-title">当月重点アクション実績</div> </div><p style="text-align:center; color:#777;">（実績なし）</p>`;
+            }
+            let tableRows = actions.map(action => `
+                <tr>
+                    <td>${action.category}</td>
+                    <td>${action.action}</td>
+                    <td>${action.goal}</td>
+                    <td>${action.result}</td>
+                    <td class="progress-value">${action.progress}</td>
+                    <td><span class="${action.statusClass}">${action.status}</span></td>
+                </tr>
+            `).join('');
+
+            return `
+                <div class="section-header"> <div class="section-title">当月重点アクション実績</div> </div>
+                <table>
+                    <thead> <tr> <th>重点施策</th> <th>当月アクション</th> <th>定量目標</th> <th>結果</th> <th>進捗</th> <th>ステータス</th> </tr> </thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+            `;
+        }
+
+        function populateView(reportType, data) {
+            document.getElementById(`${reportType}-view-title`).textContent = data.title;
+            
+            const allCardIds = ['build-package', 'measure-certs', 'learn-agent', 'learn-ai', 'learn-inasaka', 'learn-lounge', 'learn-opencampus', 'learn-assistant'];
+            const allDataKeys = ['buildPackage', 'measureCerts', 'learnAgent', 'learnAi', 'learnInasaka', 'learnLounge', 'learnOpenCampus', 'learnAssistant'];
+
+            allCardIds.forEach((cardId, index) => {
+                const cardElement = document.getElementById(`${reportType}-${cardId}`);
+                if (cardElement) {
+                    const cardData = data[allDataKeys[index]];
+                    if (cardData) {
+                        cardElement.innerHTML = createCardHTML(cardData);
+                        cardElement.style.display = 'block';
+                    } else {
+                        cardElement.style.display = 'none';
+                    }
+                }
+            });
+
+            document.getElementById(`${reportType}-action-section`).innerHTML = createActionTableHTML(data.actionTable);
+            document.getElementById(`${reportType}-ai-analysis-content`).innerHTML = `<p class="placeholder">「分析実行」ボタンをクリックすると、このレポートの要約と改善案がここに表示されます。</p>`;
+            
+            if (reportType === 'monthly') {
+                 document.getElementById('monthly-goal-container').innerHTML = data.goalContainerHTML || '';
+            }
+        }
+        
+        function renderReportView() {
+            if (!currentUniversityKey) return;
+            const uniReportData = universityDataStore[currentUniversityKey];
+            const reportType = reportTypeSelect.value;
+            
+            weeklyView.style.display = 'none';
+            weeklyView.classList.remove('active');
+            monthlyView.style.display = 'none';
+            monthlyView.classList.remove('active');
+
+            clearAllCharts();
+
+            setTimeout(() => {
+                const view = document.getElementById(`${reportType}-view`);
+                populateView(reportType, uniReportData[reportType]);
+                view.style.display = 'block';
+                view.classList.add('active');
+                setupCharts(uniReportData[reportType].charts, reportType);
+            }, 0);
+        }
+
+        function setupCharts(chartDataConfig, reportType) {
+            const targetGrid = document.getElementById(`${reportType}-charts-grid`);
+             if (!targetGrid) {
+                 console.error(`Target chart grid for ${reportType} not found!`);
+                 return;
+            }
+            targetGrid.innerHTML = ''; 
+
+             const chartGroups = [
+                {
+                    groupKey: "build", 
+                    title: "Bizチーム グラフ",
+                    charts: [chartDataConfig.package].filter(Boolean)
+                },
+                {
+                    groupKey: "measure",
+                    title: "Measure グラフ",
+                    charts: [chartDataConfig.certs].filter(Boolean),
+                    singleColumn: true 
+                },
+                {
+                    groupKey: "learn",
+                    title: "Learn グラフ",
+                    charts: [chartDataConfig.users, chartDataConfig.ai, chartDataConfig.inasaka, chartDataConfig.lounge, chartDataConfig.opencampus, chartDataConfig.assistant].filter(Boolean), 
+                }
+            ];
+
+            chartGroups.forEach(group => {
+                const validChartsForGroup = group.charts.filter(cfg => cfg && cfg.data && cfg.data.length > 0); 
+
+                if (validChartsForGroup.length === 0) return;
+
+                const groupContainer = document.createElement('div');
+                groupContainer.style.gridColumn = '1 / -1';
+                groupContainer.style.padding = '15px';
+                groupContainer.style.border = `2px solid #ccc`;
+                groupContainer.style.borderRadius = '8px';
+                groupContainer.style.marginBottom = '20px';
+
+                const groupTitleElement = document.createElement('h3');
+                groupTitleElement.style.marginTop = '0';
+                groupTitleElement.textContent = group.title;
+                groupContainer.appendChild(groupTitleElement);
+
+                const chartsDiv = document.createElement('div');
+                chartsDiv.style.display = 'grid';
+                
+                if (group.singleColumn || (group.groupKey === 'learn' && validChartsForGroup.length > 2)) {
+                     chartsDiv.style.gridTemplateColumns = '1fr';
+                } else {
+                     chartsDiv.style.gridTemplateColumns = 'repeat(auto-fit, minmax(250px, 1fr))';
+                }
+                chartsDiv.style.gap = '20px';
+                groupContainer.appendChild(chartsDiv);
+
+                validChartsForGroup.forEach(config => { 
+                    const chartWrapper = document.createElement('div');
+                    chartWrapper.classList.add('chart');
+                    const canvas = document.createElement('canvas');
+                    canvas.id = config.id + '_' + reportType + '_' + Math.random(); 
+                    chartWrapper.appendChild(canvas);
+                    chartsDiv.appendChild(chartWrapper);
+                    drawBarChart(canvas, config.data, config.labels, config.color, config.title, config.goal);
+                });
+                targetGrid.appendChild(groupContainer);
+            });
+        }
+
+        function drawBarChart(canvas, data, labels, color, title, goal = null) {
+            if (!canvas || !canvas.parentElement) return;
+            const ctx = canvas.getContext('2d');
+            
+            let drawingTimer;
+            const resizeAndDraw = () => {
+                clearTimeout(drawingTimer);
+                drawingTimer = setTimeout(() => {
+                    const parentWidth = canvas.parentElement.clientWidth;
+                    if (parentWidth === 0) return; 
+                    
+                    canvas.width = parentWidth;
+                    canvas.height = 300;
+                    
+                    const width = canvas.width;
+                    const height = canvas.height;
+                    
+                    ctx.clearRect(0, 0, width, height); 
+
+                    if (!data || data.length === 0) {
+                         ctx.fillStyle = '#333'; ctx.textAlign = 'center'; ctx.font = 'bold 14px Arial'; ctx.fillText(title, width / 2, 20); ctx.fillText("(データなし)", width / 2, height / 2);
+                        return;
+                    }
+
+                    const marginLeft = 50;
+                    const marginRight = 20;
+                    const marginTop = 40;
+                    const marginBottom = 40;
+                    const graphWidth = width - marginLeft - marginRight;
+                    const graphHeight = height - marginTop - marginBottom;
+
+                    const maxValue = Math.max(...data, (goal || 0)) * 1.2 || 1; 
+
+                    ctx.strokeStyle = '#ccc';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(marginLeft, marginTop);
+                    ctx.lineTo(marginLeft, height - marginBottom);
+                    ctx.lineTo(width - marginRight, height - marginBottom);
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#333';
+                    ctx.textAlign = 'right';
+                    ctx.textBaseline = 'middle';
+                    const yAxisSteps = 5;
+                    for (let i = 0; i <= yAxisSteps; i++) {
+                        const y = height - marginBottom - (i / yAxisSteps) * graphHeight;
+                        const value = Math.round(maxValue * (i / yAxisSteps));
+                        ctx.fillText(value, marginLeft - 10, y);
+                         if (i > 0) { 
+                             ctx.strokeStyle = '#eee'; ctx.setLineDash([2, 3]); ctx.beginPath(); ctx.moveTo(marginLeft + 1, y); ctx.lineTo(width - marginRight, y); ctx.stroke(); ctx.setLineDash([]); 
+                        }
+                    }
+
+                    const barWidth = graphWidth / data.length * 0.6;
+                    const barGap = graphWidth / data.length * 0.4;
+                    data.forEach((value, i) => {
+                        const barHeight = (value / maxValue) * graphHeight;
+                        const x = marginLeft + (i * (barWidth + barGap)) + (barGap / 2);
+                        const y = height - marginBottom - barHeight;
+
+                        ctx.fillStyle = color;
+                        ctx.fillRect(x, y, barWidth, barHeight);
+
+                        ctx.fillStyle = '#333';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(value, x + barWidth / 2, y - 10);
+                        ctx.fillText(labels[i], x + barWidth / 2, height - marginBottom + 15);
+                    });
+
+                     if (goal !== null && typeof goal === 'number' && goal > 0) { 
+                         ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 1.5; ctx.setLineDash([5, 5]); const goalY = height - marginBottom - (goal / maxValue) * graphHeight; ctx.beginPath(); ctx.moveTo(marginLeft, goalY); ctx.lineTo(width - marginRight, goalY); ctx.stroke(); ctx.setLineDash([]); 
+                         ctx.fillStyle = '#e74c3c'; ctx.textAlign = 'right'; ctx.font = '10px Arial'; ctx.fillText('目標: ' + goal, width - marginRight, goalY - 10);
+                    }
+
+                    ctx.fillStyle = '#333';
+                    ctx.font = 'bold 16px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(title, width / 2, 20);
+
+                }, 50);
+            }
+            
+            resizeAndDraw();
+        }
+        
+        function clearAllCharts() {
+             ['weekly-charts-grid', 'monthly-charts-grid'].forEach(id => {
+                const grid = document.getElementById(id);
+                if (grid) grid.innerHTML = '';
+            });
+        }
+
+        // --- Event Listeners ---
+        uniSelectButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                showReportScreen(this.dataset.university);
+            });
+        });
+
+        backToSelectionButton.addEventListener('click', showUniversitySelectionScreen);
+        reportTypeSelect.addEventListener('change', renderReportView);
+        reportDateInput.addEventListener('change', renderReportView);
+
+        document.getElementById('weekly-ai-button').addEventListener('click', getAiAnalysis);
+        document.getElementById('monthly-ai-button').addEventListener('click', getAiAnalysis);
+
+
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                if (reportScreen.style.display === 'block') { 
+                    renderReportView(); 
+                }
+            }, 250);
+        });
+
+        // --- Initial Load ---
+        window.onload = function() {
+            showUniversitySelectionScreen(); 
+        };
+    </script>
+</body>
+</html>
+
