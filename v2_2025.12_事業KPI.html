@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KPI進捗管理レポート</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans JP', 'Inter', sans-serif;
+        }
+        /* スクロールバーのデザイン */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+        /* テーブルのヘッダーを固定するためのスタイル */
+        thead th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-300 p-4 sm:p-6 lg:p-8">
+
+    <div class="max-w-screen-xl mx-auto">
+        <!-- ページ切り替えコントロール -->
+        <div class="flex justify-end mb-6">
+            <div class="relative">
+                <select id="view-selector" class="appearance-none bg-gray-800 text-white border border-gray-600 hover:border-blue-500 px-4 py-2 pr-8 rounded leading-tight focus:outline-none focus:shadow-outline transition-colors duration-200 cursor-pointer">
+                    <option value="public">KPIレポート：公的教育機関</option>
+                    <option value="private">KPIレポート：民間企業</option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- 公的教育機関 View (デフォルト表示) -->
+        <!-- ========================================== -->
+        <div id="view-public" class="dashboard-view">
+            <header class="mb-8">
+                <h1 class="text-3xl font-bold text-white tracking-wide">KPI進捗管理レポート (公的教育機関)</h1>
+                <p class="text-gray-400 mt-2">公的教育機関向けの事業目標達成状況をリアルタイムで可視化します。</p>
+            </header>
+
+            <!-- KPIテーブル -->
+            <div class="bg-gray-800 rounded-xl shadow-2xl overflow-hidden mb-12">
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-max text-sm text-center border-collapse">
+                        <thead class="bg-gray-900 text-xs text-gray-400 uppercase tracking-wider">
+                            <tr>
+                                <th scope="col" colspan="3" class="px-6 py-4 text-left border-r border-gray-700">主要KPI</th>
+                                <th scope="col" class="px-4 py-4 border-r border-gray-700">種別</th>
+                                <th scope="col" class="px-4 py-4">2025/8/31</th>
+                                <th scope="col" class="px-4 py-4">2025/9/30</th>
+                                <th scope="col" class="px-4 py-4">2025/10/31</th>
+                                <th scope="col" class="px-4 py-4 bg-blue-900/40 border-x-2 border-blue-700">2025/11/30</th>
+                                <th scope="col" class="px-4 py-4">2025/12/31</th>
+                                <th scope="col" class="px-4 py-4">2026/1/31</th>
+                                <th scope="col" class="px-4 py-4">2026/2/28</th>
+                                <th scope="col" class="px-4 py-4">2026/3/31</th>
+                                <th scope="col" class="px-4 py-4">2026/4/30</th>
+                                <th scope="col" class="px-4 py-4">2026/5/31</th>
+                                <th scope="col" class="px-4 py-4">2026/6/30</th>
+                                <th scope="col" class="px-4 py-4">2026/7/31</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-700">
+                            <!-- トライアル (2行構成) -->
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                <td rowspan="2" colspan="3" class="px-6 py-3 text-left font-semibold text-white border-r border-gray-700 bg-gray-800 align-middle">トライアル</td>
+                                <td class="px-4 py-2 text-white font-semibold border-r border-gray-700">月間実績</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">3</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">2</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30 bg-blue-900/40 border-x-2 border-blue-700">1</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                            </tr>
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                <td class="px-4 py-2 text-white font-semibold border-r border-gray-700">累計実績</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">1</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">4</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">6</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30 bg-blue-900/40 border-x-2 border-blue-700">7</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                            </tr>
+
+                            <!-- ■■■ 本成約セクション開始 (全16行) ■■■ -->
+                            
+                            <!-- 1. 導入数 (6行) -->
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                <td rowspan="16" class="px-4 py-3 text-left font-bold text-white border-r border-gray-700 bg-gray-800 align-top pt-6 w-24">本成約</td>
+                                <td rowspan="6" colspan="2" class="px-4 py-3 text-left font-semibold text-gray-200 border-r border-gray-700 bg-gray-800/50 align-top pt-6">
+                                    導入数
+                                </td>
+                                <td class="px-4 py-2 text-gray-400 border-r border-gray-700">月間計画</td>
+                                <td class="px-4 py-2 font-mono">0</td>
+                                <td class="px-4 py-2 font-mono">0</td>
+                                <td class="px-4 py-2 font-mono">0</td>
+                                <td class="px-4 py-2 font-mono bg-blue-900/40 border-x-2 border-blue-700">0</td>
+                                <td class="px-4 py-2 font-mono">0</td>
+                                <td class="px-4 py-2 font-mono">0</td>
+                                <td class="px-4 py-2 font-mono">0</td>
+                                <td class="px-4 py-2 font-mono">0</td>
+                                <td class="px-4 py-2 font-mono">6</td>
+                                <td class="px-4 py-2 font-mono">0</td>
+                                <td class="px-4 py-2 font-mono">0</td>
+                                <td class="px-4 py-2 font-mono">0</td>
+                            </tr>
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                <td class="px-4 py-2 text-white font-semibold border-r border-gray-700">月間実績</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30 bg-blue-900/40 border-x-2 border-blue-700">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                            </tr>
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                <td class="px-4 py-2 text-sky-400 border-r border-gray-700">達成率</td>
+                                <td class="px-4 py-2 font-mono font-bold">-</td>
+                                <td class="px-4 py-2 font-mono font-bold">-</td>
+                                <td class="px-4 py-2 font-mono font-bold">-</td>
+                                <td class="px-4 py-2 font-mono font-bold bg-blue-900/40 border-x-2 border-blue-700">-</td>
+                                <td class="px-4 py-2 font-mono font-bold">-</td>
+                                <td class="px-4 py-2 font-mono font-bold">-</td>
+                                <td class="px-4 py-2 font-mono font-bold">-</td>
+                                <td class="px-4 py-2 font-mono font-bold">-</td>
+                                <td class="px-4 py-2 font-mono font-bold">-</td>
+                                <td class="px-4 py-2 font-mono font-bold">-</td>
+                                <td class="px-4 py-2 font-mono font-bold">-</td>
+                                <td class="px-4 py-2 font-mono font-bold">-</td>
+                            </tr>
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                <td class="px-4 py-2 text-gray-400 border-r border-gray-700">累計計画</td>
+                                <td class="px-4 py-2 font-mono">0</td>
+                                <td class="px-4 py-2 font-mono">0</td>
+                                <td class="px-4 py-2 font-mono">0</td>
+                                <td class="px-4 py-2 font-mono bg-blue-900/40 border-x-2 border-blue-700">0</td>
+                                <td class="px-4 py-2 font-mono">0</td>
+                                <td class="px-4 py-2 font-mono">0</td>
+                                <td class="px-4 py-2 font-mono">0</td>
+                                <td class="px-4 py-2 font-mono">0</td>
+                                <td class="px-4 py-2 font-mono">7</td>
+                                <td class="px-4 py-2 font-mono">0</td>
+                                <td class="px-4 py-2 font-mono">0</td>
+                                <td class="px-4 py-2 font-mono">0</td>
+                            </tr>
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                <td class="px-4 py-2 text-white font-semibold border-r border-gray-700">累計実績</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">1</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">1</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">1</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30 bg-blue-900/40 border-x-2 border-blue-700">1</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                            </tr>
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                <td class="px-4 py-2 text-cyan-400 border-r border-gray-700">累計達成率</td>
+                                <td class="px-4 py-2 font-mono font-bold">-</td>
+                                <td class="px-4 py-2 font-mono font-bold">-</td>
+                                <td class="px-4 py-2 font-mono font-bold">-</td>
+                                <td class="px-4 py-2 font-mono font-bold bg-blue-900/40 border-x-2 border-blue-700">-</td>
+                                <td class="px-4 py-2 font-mono font-bold">-</td>
+                                <td class="px-4 py-2 font-mono font-bold">-</td>
+                                <td class="px-4 py-2 font-mono font-bold">-</td>
+                                <td class="px-4 py-2 font-mono font-bold">-</td>
+                                <td class="px-4 py-2 font-mono font-bold">-</td>
+                                <td class="px-4 py-2 font-mono font-bold">-</td>
+                                <td class="px-4 py-2 font-mono font-bold">-</td>
+                                <td class="px-4 py-2 font-mono font-bold">-</td>
+                            </tr>
+
+                            <!-- 2. アカウント数 (2行) -->
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                <td rowspan="2" colspan="2" class="px-4 py-3 text-left font-semibold text-gray-200 border-r border-gray-700 bg-gray-800/50 align-top pt-4">
+                                    アカウント数
+                                </td>
+                                <td class="px-4 py-2 text-white font-semibold border-r border-gray-700">月間実績</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30 bg-blue-900/40 border-x-2 border-blue-700">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                            </tr>
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                <td class="px-4 py-2 text-white font-semibold border-r border-gray-700">累計実績</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">10,000</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">10,000</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">10,000</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30 bg-blue-900/40 border-x-2 border-blue-700">10,000</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                            </tr>
+
+                            <!-- 3. プラン (8行: 4プラン × 2行) -->
+                            <!-- お試し -> SSに変更 -->
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                <td rowspan="8" class="px-4 py-3 text-left font-semibold text-gray-200 border-r border-gray-700 bg-gray-800/50 align-top pt-4">
+                                    プラン
+                                </td>
+                                <td rowspan="2" class="px-4 py-2 text-gray-300 font-medium bg-gray-800/30 text-left border-r border-gray-700 align-middle">SS</td>
+                                <td class="px-4 py-2 text-white font-semibold border-r border-gray-700">月間実績</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30 bg-blue-900/40 border-x-2 border-blue-700">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                            </tr>
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                <td class="px-4 py-2 text-white font-semibold border-r border-gray-700">累計実績</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30 bg-blue-900/40 border-x-2 border-blue-700">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                            </tr>
+                            <!-- Sプラン -->
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                <td rowspan="2" class="px-4 py-2 text-gray-300 font-medium bg-gray-800/30 text-left border-r border-gray-700 align-middle">S</td>
+                                <td class="px-4 py-2 text-white font-semibold border-r border-gray-700">月間実績</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30 bg-blue-900/40 border-x-2 border-blue-700">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                            </tr>
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                <td class="px-4 py-2 text-white font-semibold border-r border-gray-700">累計実績</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30 bg-blue-900/40 border-x-2 border-blue-700">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                            </tr>
+                            <!-- Mプラン -->
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                <td rowspan="2" class="px-4 py-2 text-gray-300 font-medium bg-gray-800/30 text-left border-r border-gray-700 align-middle">M</td>
+                                <td class="px-4 py-2 text-white font-semibold border-r border-gray-700">月間実績</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30 bg-blue-900/40 border-x-2 border-blue-700">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                            </tr>
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                <td class="px-4 py-2 text-white font-semibold border-r border-gray-700">累計実績</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30 bg-blue-900/40 border-x-2 border-blue-700">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                            </tr>
+                            <!-- Lプラン -->
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                <td rowspan="2" class="px-4 py-2 text-gray-300 font-medium bg-gray-800/30 text-left border-r border-gray-700 align-middle">L</td>
+                                <td class="px-4 py-2 text-white font-semibold border-r border-gray-700">月間実績</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30 bg-blue-900/40 border-x-2 border-blue-700">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                            </tr>
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                <td class="px-4 py-2 text-white font-semibold border-r border-gray-700">累計実績</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30 bg-blue-900/40 border-x-2 border-blue-700">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                            </tr>
+                        </tbody>
+                        <tfoot class="bg-gray-900">
+                            <tr class="text-xs text-gray-500">
+                                <td colspan="18" class="px-6 py-4 text-left">
+                                    ※ 本表は公的教育機関向けのKPI進捗状況を示しています。
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <footer class="mt-8 text-gray-500 text-sm mb-12">
+                <h3 class="font-semibold text-lg text-gray-300 mb-2">【補足】</h3>
+                <ul class="list-disc list-inside space-y-2">
+                    <li><strong class="text-gray-300">実績:</strong> <span class="px-2 py-1 bg-sky-900/30 rounded-md">薄い青色のセル</span>に実数値を入力してください。</li>
+                    <li><strong class="text-gray-300">達成率:</strong> 「実績 ÷ 計画」で算出されます。達成度に応じて色が変わるようにすると、より視覚的に状況を把握できます。(例: 100%以上は<span class="text-green-400">緑</span>, 80-99%は<span class="text-yellow-400">黄</span>, 80%未満は<span class="text-red-400">赤</span>)</li>
+                    <li><strong class="text-gray-300">計画値:</strong> 「-」となっている商談数や成約CVRには、必要に応じて目標値を設定してください。</li>
+                </ul>
+            </footer>
+
+            <!-- 区切り線を追加して分離を強調 -->
+            <hr class="border-gray-700 my-12">
+
+            <!-- 顧客リスト＆売上シミュレーション -->
+            <div class="mt-12">
+                <header class="mb-8">
+                    <h2 class="text-2xl font-bold text-white tracking-wide">顧客リスト＆売上シミュレーション (公的教育機関)</h2>
+                    <p class="text-gray-400 mt-2">現在の契約状況と将来の売上見込みです。</p>
+                </header>
+
+                <!-- 料金プラン表 (公的教育機関) -->
+                <div class="mb-8 bg-gray-800 rounded-lg p-6 shadow-lg border border-gray-700">
+                    <h3 class="text-lg font-bold text-white mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        プランごとの年額料金
+                    </h3>
+                    
+                    <!-- アカウント保管料 -->
+                    <div class="mb-6 p-4 bg-gray-900/50 rounded border border-gray-600 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                        <div>
+                            <h4 class="text-gray-300 font-semibold">アカウント保管料</h4>
+                            <p class="text-xs text-gray-500">利用者1名あたりの年間費用</p>
+                        </div>
+                        <div class="text-cyan-400 font-bold font-mono text-xl">
+                            ¥1,000<span class="text-xs text-gray-500">/人・年</span>
+                        </div>
+                    </div>
+
+                    <!-- UC伴走支援料 -->
+                    <h4 class="text-gray-300 font-semibold mb-3 border-l-4 border-blue-600 pl-2">UC伴走支援料</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="bg-gray-900/50 p-4 rounded border border-gray-700 text-center">
+                            <div class="text-gray-400 text-xs mb-1">SS</div>
+                            <div class="text-cyan-400 font-bold font-mono text-lg">100~250<span class="text-xs text-gray-500">万円</span></div>
+                        </div>
+                        <div class="bg-gray-900/50 p-4 rounded border border-gray-700 text-center">
+                            <div class="text-gray-400 text-xs mb-1">S</div>
+                            <div class="text-cyan-400 font-bold font-mono text-lg">750<span class="text-xs text-gray-500">万円</span></div>
+                        </div>
+                        <div class="bg-gray-900/50 p-4 rounded border border-gray-700 text-center">
+                            <div class="text-gray-400 text-xs mb-1">M</div>
+                            <div class="text-cyan-400 font-bold font-mono text-lg">1,200<span class="text-xs text-gray-500">万円</span></div>
+                        </div>
+                        <div class="bg-gray-900/50 p-4 rounded border border-gray-700 text-center">
+                            <div class="text-gray-400 text-xs mb-1">L</div>
+                            <div class="text-cyan-400 font-bold font-mono text-lg">1,500<span class="text-xs text-gray-500">万円</span></div>
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="bg-gray-800 rounded-xl shadow-2xl overflow-hidden mb-12">
+                    <div class="overflow-x-auto">
+                        <table class="w-full min-w-max text-sm text-center">
+                            <thead class="bg-gray-900 text-xs text-gray-400 uppercase tracking-wider">
+                                <tr>
+                                    <th scope="col" rowspan="2" class="px-6 py-4 text-left">顧客名</th>
+                                    <th scope="col" rowspan="2" class="px-6 py-4">ステータス</th>
+                                    <th scope="col" rowspan="2" class="px-6 py-4">ユースケース</th>
+                                    <th scope="col" colspan="4" class="px-6 py-4 border-l border-gray-700">売上シミュレーション (年額)</th>
+                                </tr>
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 border-l border-gray-700 text-xs">本契約金額（確定）</th>
+                                    <th scope="col" class="px-6 py-3 text-xs">本契約金額（増加見込み）</th>
+                                    <th scope="col" class="px-6 py-3 text-xs">トライアル（100%試算）</th>
+                                    <th scope="col" class="px-6 py-3 text-xs">トライアル（50%試算）</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-700" id="customer-list-body-public">
+                                <!-- ... existing customer list items (IDだけ付与) ... -->
+                                <!-- ※ 元のコードの内容をそのまま挿入。ただしJSからの参照用に、tbodyに id="customer-list-body-public" をつけ、
+                                      ボタンも id="calculate-button-public" に変更、結果表示も id="grand-total-public" に変更する -->
+                                <!-- ■ ステータス：本契約中 -->
+                                <!-- 千葉工業大学 -->
+                                <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                    <td class="px-6 py-4 text-left font-semibold text-white">千葉工業大学</td>
+                                    <td class="px-6 py-4"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-900/50 text-green-300">本契約中</span></td>
+                                    <td class="px-6 py-4 text-left">キャリア, 語学</td>
+                                    <td class="px-6 py-4 font-mono border-l border-gray-700 bg-green-900/30">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="10000000">
+                                            <span>¥10,000,000</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono bg-green-900/30">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="15000000">
+                                            <span>¥15,000,000</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono text-gray-500">-</td>
+                                    <td class="px-6 py-4 font-mono text-gray-500">-</td>
+                                </tr>
+                                <!-- 成城学園（高校） -->
+                                <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                    <td class="px-6 py-4 text-left font-semibold text-white">成城学園（高校）</td>
+                                    <td class="px-6 py-4"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-900/50 text-yellow-300">トライアル</span></td>
+                                    <td class="px-6 py-4 text-left">キャリア</td>
+                                    <td class="px-6 py-4 font-mono text-gray-500 border-l border-gray-700">-</td>
+                                    <td class="px-6 py-4 font-mono text-gray-500">-</td>
+                                    <td class="px-6 py-4 font-mono bg-yellow-900/30">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="257473">
+                                            <span>¥257,473</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono bg-yellow-900/30">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="128737">
+                                            <span>¥128,737</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- 北海道教育大学 -->
+                                <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                    <td class="px-6 py-4 text-left font-semibold text-white">北海道教育大学</td>
+                                    <td class="px-6 py-4"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-900/50 text-yellow-300">トライアル</span></td>
+                                    <td class="px-6 py-4 text-left">語学</td>
+                                    <td class="px-6 py-4 font-mono text-gray-500 border-l border-gray-700">-</td>
+                                    <td class="px-6 py-4 font-mono text-gray-500">-</td>
+                                    <td class="px-6 py-4 font-mono bg-yellow-900/30">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="30000">
+                                            <span>¥30,000</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono bg-yellow-900/30">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="15000">
+                                            <span>¥15,000</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- 金沢星稜大学 (削除) -->
+                                <!-- 愛知大学 -->
+                                <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                    <td class="px-6 py-4 text-left font-semibold text-white">愛知大学</td>
+                                    <td class="px-6 py-4"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-900/50 text-yellow-300">トライアル</span></td>
+                                    <td class="px-6 py-4 text-left">語学</td>
+                                    <td class="px-6 py-4 font-mono text-gray-500 border-l border-gray-700">-</td>
+                                    <td class="px-6 py-4 font-mono text-gray-500">-</td>
+                                    <td class="px-6 py-4 font-mono bg-yellow-900/30">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="45000">
+                                            <span>¥45,000</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono bg-yellow-900/30">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="22500">
+                                            <span>¥22,500</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- 和洋女子大学 -->
+                                <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                    <td class="px-6 py-4 text-left font-semibold text-white">和洋女子大学</td>
+                                    <td class="px-6 py-4"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-900/50 text-yellow-300">トライアル</span></td>
+                                    <td class="px-6 py-4 text-left">語学</td>
+                                    <td class="px-6 py-4 font-mono text-gray-500 border-l border-gray-700">-</td>
+                                    <td class="px-6 py-4 font-mono text-gray-500">-</td>
+                                    <td class="px-6 py-4 font-mono bg-yellow-900/30">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="30000">
+                                            <span>¥30,000</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono bg-yellow-900/30">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="15000">
+                                            <span>¥15,000</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- 中京大学 -->
+                                <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                    <td class="px-6 py-4 text-left font-semibold text-white">中京大学</td>
+                                    <td class="px-6 py-4"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-900/50 text-yellow-300">トライアル</span></td>
+                                    <td class="px-6 py-4 text-left">キャリア</td>
+                                    <td class="px-6 py-4 font-mono text-gray-500 border-l border-gray-700">-</td>
+                                    <td class="px-6 py-4 font-mono text-gray-500">-</td>
+                                    <td class="px-6 py-4 font-mono bg-yellow-900/20">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="4836364">
+                                            <span>¥4,836,364</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono bg-yellow-900/20">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="2418182">
+                                            <span>¥2,418,182</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- 大阪教育大学 -->
+                                <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                    <td class="px-6 py-4 text-left font-semibold text-white">大阪教育大学</td>
+                                    <td class="px-6 py-4"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-900/50 text-yellow-300">トライアル</span></td>
+                                    <td class="px-6 py-4 text-left">語学</td>
+                                    <td class="px-6 py-4 font-mono text-gray-500 border-l border-gray-700">-</td>
+                                    <td class="px-6 py-4 font-mono text-gray-500">-</td>
+                                    <td class="px-6 py-4 font-mono bg-yellow-900/20">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="30000">
+                                            <span>¥30,000</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono bg-yellow-900/20">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="15000">
+                                            <span>¥15,000</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- 大阪電気通信大学 -->
+                                <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                    <td class="px-6 py-4 text-left font-semibold text-white">大阪電気通信大学</td>
+                                    <td class="px-6 py-4"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-900/50 text-yellow-300">トライアル</span></td>
+                                    <td class="px-6 py-4 text-left">その他</td>
+                                    <td class="px-6 py-4 font-mono text-gray-500 border-l border-gray-700">-</td>
+                                    <td class="px-6 py-4 font-mono text-gray-500">-</td>
+                                    <td class="px-6 py-4 font-mono bg-yellow-900/20">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="45000">
+                                            <span>¥45,000</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono bg-yellow-900/20">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="22500">
+                                            <span>¥22,500</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- 成城学園（大学） -->
+                                <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                    <td class="px-6 py-4 text-left font-semibold text-white">成城学園（大学）</td>
+                                    <td class="px-6 py-4"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-purple-900/50 text-purple-300">Aヨミ</span></td>
+                                    <td class="px-6 py-4 text-left">キャリア</td>
+                                    <td class="px-6 py-4 font-mono text-gray-500 border-l border-gray-700">-</td>
+                                    <td class="px-6 py-4 font-mono text-gray-500">-</td>
+                                    <td class="px-6 py-4 font-mono bg-purple-900/20">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="4800000">
+                                            <span>¥4,800,000</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono bg-purple-900/20">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="2400000">
+                                            <span>¥2,400,000</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- 専修大学松戸中学校・高等学校 -->
+                                <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                    <td class="px-6 py-4 text-left font-semibold text-white">専修大学松戸中学校・高等学校</td>
+                                    <td class="px-6 py-4"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-purple-900/50 text-purple-300">Aヨミ</span></td>
+                                    <td class="px-6 py-4 text-left">キャリア</td>
+                                    <td class="px-6 py-4 font-mono text-gray-500 border-l border-gray-700">-</td>
+                                    <td class="px-6 py-4 font-mono text-gray-500">-</td>
+                                    <td class="px-6 py-4 font-mono bg-purple-900/20">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="909091">
+                                            <span>¥909,091</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono bg-purple-900/20">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="454546">
+                                            <span>¥454,546</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- 東京家政大学 -->
+                                <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                    <td class="px-6 py-4 text-left font-semibold text-white">東京家政大学</td>
+                                    <td class="px-6 py-4"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-purple-900/50 text-purple-300">Aヨミ</span></td>
+                                    <td class="px-6 py-4 text-left">キャリア</td>
+                                    <td class="px-6 py-4 font-mono text-gray-500 border-l border-gray-700">-</td>
+                                    <td class="px-6 py-4 font-mono text-gray-500">-</td>
+                                    <td class="px-6 py-4 font-mono bg-purple-900/20">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="909091">
+                                            <span>¥909,091</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono bg-purple-900/20">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="454546">
+                                            <span>¥454,546</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- 小山学園 -->
+                                <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                    <td class="px-6 py-4 text-left font-semibold text-white">小山学園</td>
+                                    <td class="px-6 py-4"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-purple-900/50 text-purple-300">Aヨミ</span></td>
+                                    <td class="px-6 py-4 text-left">語学</td>
+                                    <td class="px-6 py-4 font-mono text-gray-500 border-l border-gray-700">-</td>
+                                    <td class="px-6 py-4 font-mono text-gray-500">-</td>
+                                    <td class="px-6 py-4 font-mono bg-purple-900/20">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="4800000">
+                                            <span>¥4,800,000</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono bg-purple-900/20">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="2400000">
+                                            <span>¥2,400,000</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- 大阪教育大学 -->
+                                <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                    <td class="px-6 py-4 text-left font-semibold text-white">大阪教育大学</td>
+                                    <td class="px-6 py-4"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-purple-900/50 text-purple-300">Aヨミ</span></td>
+                                    <td class="px-6 py-4 text-left">語学</td>
+                                    <td class="px-6 py-4 font-mono text-gray-500 border-l border-gray-700">-</td>
+                                    <td class="px-6 py-4 font-mono text-gray-500">-</td>
+                                    <td class="px-6 py-4 font-mono bg-purple-900/20">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="30000">
+                                            <span>¥30,000</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono bg-purple-900/20">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="15000">
+                                            <span>¥15,000</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- 大阪電気通信大学 -->
+                                <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                    <td class="px-6 py-4 text-left font-semibold text-white">大阪電気通信大学</td>
+                                    <td class="px-6 py-4"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-purple-900/50 text-purple-300">Aヨミ</span></td>
+                                    <td class="px-6 py-4 text-left">その他</td>
+                                    <td class="px-6 py-4 font-mono text-gray-500 border-l border-gray-700">-</td>
+                                    <td class="px-6 py-4 font-mono text-gray-500">-</td>
+                                    <td class="px-6 py-4 font-mono bg-purple-900/20">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="45000">
+                                            <span>¥45,000</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono bg-purple-900/20">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="22500">
+                                            <span>¥22,500</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot class="bg-gray-900">
+                                <tr>
+                                    <th scope="row" colspan="3" class="px-6 py-4 text-right font-bold text-white uppercase">合計金額</th>
+                                    <td class="px-6 py-4 font-mono font-bold text-lg text-white border-l border-gray-700 bg-green-900/30">¥10,000,000</td>
+                                    <td class="px-6 py-4 font-mono font-bold text-lg text-white bg-green-900/30">¥15,000,000</td>
+                                    <td class="px-6 py-4 font-mono font-bold text-lg text-white bg-yellow-900/30">¥16,767,019</td>
+                                    <td class="px-6 py-4 font-mono font-bold text-lg text-white bg-yellow-900/30">¥8,383,511</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <!-- 合計カウンター (公的教育機関) -->
+                    <div class="mt-6 px-6 py-4 bg-gray-900/50 rounded-lg flex flex-wrap items-center justify-between gap-4">
+                        <div class="flex flex-wrap gap-4">
+                            <button id="calculate-button-public" class="calculate-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg transition-colors duration-200 shadow-lg shadow-blue-500/20" data-target="view-public">
+                                選択した項目を合計 (公的教育機関)
+                            </button>
+                            <button id="reset-button-public" class="reset-btn bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-5 rounded-lg transition-colors duration-200 shadow-lg shadow-gray-500/20" data-target="view-public">
+                                選択を解除
+                            </button>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-sm text-gray-400 uppercase">選択項目 合計金額</span>
+                            <p id="grand-total-public" class="font-mono font-bold text-2xl text-cyan-400">¥0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- 民間企業 View (初期非表示) -->
+        <!-- ========================================== -->
+        <div id="view-private" class="dashboard-view hidden">
+            <!-- ... existing private view code ... -->
+            <!-- ※ 民間企業ビューの中身は変更なし。以下はそのまま保持 -->
+            <header class="mb-8">
+                <h1 class="text-3xl font-bold text-white tracking-wide">KPI進捗管理レポート (民間企業)</h1>
+                <p class="text-gray-400 mt-2">民間企業向けの事業目標達成状況をリアルタイムで可視化します。</p>
+            </header>
+
+            <!-- KPIテーブル (民間) -->
+            <div class="bg-gray-800 rounded-xl shadow-2xl overflow-hidden mb-12">
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-max text-sm text-center border-collapse">
+                        <thead class="bg-gray-900 text-xs text-gray-400 uppercase tracking-wider">
+                            <tr>
+                                <th scope="col" colspan="3" class="px-6 py-4 text-left border-r border-gray-700">主要KPI</th>
+                                <th scope="col" class="px-4 py-4 border-r border-gray-700">種別</th>
+                                <th scope="col" class="px-4 py-4">2025/8/31</th>
+                                <th scope="col" class="px-4 py-4">2025/9/30</th>
+                                <th scope="col" class="px-4 py-4">2025/10/31</th>
+                                <th scope="col" class="px-4 py-4 bg-blue-900/40 border-x-2 border-blue-700">2025/11/30</th>
+                                <th scope="col" class="px-4 py-4">2025/12/31</th>
+                                <th scope="col" class="px-4 py-4">2026/1/31</th>
+                                <th scope="col" class="px-4 py-4">2026/2/28</th>
+                                <th scope="col" class="px-4 py-4">2026/3/31</th>
+                                <th scope="col" class="px-4 py-4">2026/4/30</th>
+                                <th scope="col" class="px-4 py-4">2026/5/31</th>
+                                <th scope="col" class="px-4 py-4">2026/6/30</th>
+                                <th scope="col" class="px-4 py-4">2026/7/31</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-700">
+                             <!-- トライアル (2行構成) -->
+                             <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                <td rowspan="2" colspan="3" class="px-6 py-3 text-left font-semibold text-white border-r border-gray-700 bg-gray-800 align-middle">トライアル</td>
+                                <td class="px-4 py-2 text-white font-semibold border-r border-gray-700">月間実績</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">4</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30 bg-blue-900/40 border-x-2 border-blue-700">2</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                            </tr>
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                <td class="px-4 py-2 text-white font-semibold border-r border-gray-700">累計実績</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">4</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30 bg-blue-900/40 border-x-2 border-blue-700">6</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                            </tr>
+
+                            <!-- 本成約 -->
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                <td rowspan="16" class="px-4 py-3 text-left font-bold text-white border-r border-gray-700 bg-gray-800 align-top pt-6 w-24">本成約</td>
+                                <td rowspan="6" colspan="2" class="px-4 py-3 text-left font-semibold text-gray-200 border-r border-gray-700 bg-gray-800/50 align-top pt-6">導入数</td>
+                                <td class="px-4 py-2 text-gray-400 border-r border-gray-700">月間計画</td>
+                                <td class="px-4 py-2 font-mono">0</td><td class="px-4 py-2 font-mono">0</td><td class="px-4 py-2 font-mono">0</td><td class="px-4 py-2 font-mono bg-blue-900/40 border-x-2 border-blue-700">0</td><td class="px-4 py-2 font-mono">0</td><td class="px-4 py-2 font-mono">0</td><td class="px-4 py-2 font-mono">0</td><td class="px-4 py-2 font-mono">0</td><td class="px-4 py-2 font-mono">8</td><td class="px-4 py-2 font-mono">8</td><td class="px-4 py-2 font-mono">9</td><td class="px-4 py-2 font-mono">9</td>
+                            </tr>
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                <td class="px-4 py-2 text-white font-semibold border-r border-gray-700">月間実績</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30 bg-blue-900/40 border-x-2 border-blue-700">0</td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                            </tr>
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                <td class="px-4 py-2 text-sky-400 border-r border-gray-700">達成率</td>
+                                <td class="px-4 py-2 font-mono font-bold">-</td><td class="px-4 py-2 font-mono font-bold">-</td><td class="px-4 py-2 font-mono font-bold">-</td><td class="px-4 py-2 font-mono font-bold bg-blue-900/40 border-x-2 border-blue-700">-</td><td class="px-4 py-2 font-mono font-bold">-</td><td class="px-4 py-2 font-mono font-bold">-</td><td class="px-4 py-2 font-mono font-bold">-</td><td class="px-4 py-2 font-mono font-bold">-</td><td class="px-4 py-2 font-mono font-bold">-</td><td class="px-4 py-2 font-mono font-bold">-</td><td class="px-4 py-2 font-mono font-bold">-</td><td class="px-4 py-2 font-mono font-bold">-</td>
+                            </tr>
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                <td class="px-4 py-2 text-gray-400 border-r border-gray-700">累計計画</td>
+                                <td class="px-4 py-2 font-mono">0</td><td class="px-4 py-2 font-mono">0</td><td class="px-4 py-2 font-mono">0</td><td class="px-4 py-2 font-mono bg-blue-900/40 border-x-2 border-blue-700">0</td><td class="px-4 py-2 font-mono">0</td><td class="px-4 py-2 font-mono">0</td><td class="px-4 py-2 font-mono">0</td><td class="px-4 py-2 font-mono">0</td><td class="px-4 py-2 font-mono">8</td><td class="px-4 py-2 font-mono">16</td><td class="px-4 py-2 font-mono">25</td><td class="px-4 py-2 font-mono">34</td>
+                            </tr>
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                <td class="px-4 py-2 text-white font-semibold border-r border-gray-700">累計実績</td>
+                                <td class="px-4 py-2 font-mono bg-sky-900/30">1</td><td class="px-4 py-2 font-mono bg-sky-900/30">1</td><td class="px-4 py-2 font-mono bg-sky-900/30">1</td><td class="px-4 py-2 font-mono bg-sky-900/30 bg-blue-900/40 border-x-2 border-blue-700">1</td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td>
+                            </tr>
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200">
+                                <td class="px-4 py-2 text-cyan-400 border-r border-gray-700">累計達成率</td>
+                                <td class="px-4 py-2 font-mono font-bold">-</td><td class="px-4 py-2 font-mono font-bold">-</td><td class="px-4 py-2 font-mono font-bold">-</td><td class="px-4 py-2 font-mono font-bold bg-blue-900/40 border-x-2 border-blue-700">-</td><td class="px-4 py-2 font-mono font-bold">-</td><td class="px-4 py-2 font-mono font-bold">-</td><td class="px-4 py-2 font-mono font-bold">-</td><td class="px-4 py-2 font-mono font-bold">-</td><td class="px-4 py-2 font-mono font-bold">-</td><td class="px-4 py-2 font-mono font-bold">-</td><td class="px-4 py-2 font-mono font-bold">-</td><td class="px-4 py-2 font-mono font-bold">-</td>
+                            </tr>
+
+                             <!-- プラン -->
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200"><td rowspan="10" class="px-4 py-3 text-left font-semibold text-gray-200 border-r border-gray-700 bg-gray-800/50 align-top pt-4">プラン</td><td rowspan="2" class="px-4 py-2 text-gray-300 font-medium bg-gray-800/30 text-left border-r border-gray-700 align-middle">A（1~20）</td><td class="px-4 py-2 text-white font-semibold border-r border-gray-700">月間実績</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30 bg-blue-900/40 border-x-2 border-blue-700">0</td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td></tr>
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200"><td class="px-4 py-2 text-white font-semibold border-r border-gray-700">累計実績</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30 bg-blue-900/40 border-x-2 border-blue-700">0</td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td></tr>
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200"><td rowspan="2" class="px-4 py-2 text-gray-300 font-medium bg-gray-800/30 text-left border-r border-gray-700 align-middle">B（21~50）</td><td class="px-4 py-2 text-white font-semibold border-r border-gray-700">月間実績</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30 bg-blue-900/40 border-x-2 border-blue-700">0</td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td></tr>
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200"><td class="px-4 py-2 text-white font-semibold border-r border-gray-700">累計実績</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30 bg-blue-900/40 border-x-2 border-blue-700">0</td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td></tr>
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200"><td rowspan="2" class="px-4 py-2 text-gray-300 font-medium bg-gray-800/30 text-left border-r border-gray-700 align-middle">C（51~100）</td><td class="px-4 py-2 text-white font-semibold border-r border-gray-700">月間実績</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30 bg-blue-900/40 border-x-2 border-blue-700">0</td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td></tr>
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200"><td class="px-4 py-2 text-white font-semibold border-r border-gray-700">累計実績</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30 bg-blue-900/40 border-x-2 border-blue-700">0</td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td></tr>
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200"><td rowspan="2" class="px-4 py-2 text-gray-300 font-medium bg-gray-800/30 text-left border-r border-gray-700 align-middle">D（101~500）</td><td class="px-4 py-2 text-white font-semibold border-r border-gray-700">月間実績</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30 bg-blue-900/40 border-x-2 border-blue-700">0</td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td></tr>
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200"><td class="px-4 py-2 text-white font-semibold border-r border-gray-700">累計実績</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30 bg-blue-900/40 border-x-2 border-blue-700">0</td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td></tr>
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200"><td rowspan="2" class="px-4 py-2 text-gray-300 font-medium bg-gray-800/30 text-left border-r border-gray-700 align-middle">E（501~1000）</td><td class="px-4 py-2 text-white font-semibold border-r border-gray-700">月間実績</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30 bg-blue-900/40 border-x-2 border-blue-700">0</td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td></tr>
+                            <tr class="hover:bg-gray-700/50 transition-colors duration-200"><td class="px-4 py-2 text-white font-semibold border-r border-gray-700">累計実績</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30">0</td><td class="px-4 py-2 font-mono bg-sky-900/30 bg-blue-900/40 border-x-2 border-blue-700">0</td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td><td class="px-4 py-2 font-mono bg-sky-900/30"></td></tr>
+                        </tbody>
+                        <tfoot class="bg-gray-900">
+                            <tr class="text-xs text-gray-500">
+                                <td colspan="18" class="px-6 py-4 text-left">
+                                    ※ 本表は民間企業向けのKPI進捗状況を示しています。
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <footer class="mt-8 text-gray-500 text-sm mb-12">
+                <h3 class="font-semibold text-lg text-gray-300 mb-2">【補足】</h3>
+                <ul class="list-disc list-inside space-y-2">
+                    <li><strong class="text-gray-300">実績:</strong> <span class="px-2 py-1 bg-sky-900/30 rounded-md">薄い青色のセル</span>に実数値を入力してください。</li>
+                    <li><strong class="text-gray-300">達成率:</strong> 「実績 ÷ 計画」で算出されます。</li>
+                </ul>
+            </footer>
+
+             <!-- 区切り線を追加して分離を強調 -->
+             <hr class="border-gray-700 my-12">
+
+            <!-- 顧客リスト＆売上シミュレーション (民間) -->
+            <div class="mt-12">
+                <header class="mb-8">
+                    <h2 class="text-2xl font-bold text-white tracking-wide">顧客リスト＆売上シミュレーション (民間企業)</h2>
+                    <p class="text-gray-400 mt-2">現在の契約状況と将来の売上見込みです。</p>
+                </header>
+
+                <!-- 料金プラン表 (移動先) -->
+                <div class="mb-8 bg-gray-800 rounded-lg p-6 shadow-lg border border-gray-700">
+                    <!-- ... existing private pricing table ... -->
+                    <h3 class="text-lg font-bold text-white mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        プランごとの月額料金
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                        <div class="bg-gray-900/50 p-4 rounded border border-gray-700 text-center">
+                            <div class="text-gray-400 text-xs mb-1">A（1~20）</div>
+                            <div class="text-cyan-400 font-bold font-mono text-lg">¥10,000<span class="text-xs text-gray-500">/月</span></div>
+                        </div>
+                        <div class="bg-gray-900/50 p-4 rounded border border-gray-700 text-center">
+                            <div class="text-gray-400 text-xs mb-1">B（21~50）</div>
+                            <div class="text-cyan-400 font-bold font-mono text-lg">¥25,000<span class="text-xs text-gray-500">/月</span></div>
+                        </div>
+                        <div class="bg-gray-900/50 p-4 rounded border border-gray-700 text-center">
+                            <div class="text-gray-400 text-xs mb-1">C（51~100）</div>
+                            <div class="text-cyan-400 font-bold font-mono text-lg">¥50,000<span class="text-xs text-gray-500">/月</span></div>
+                        </div>
+                        <div class="bg-gray-900/50 p-4 rounded border border-gray-700 text-center">
+                            <div class="text-gray-400 text-xs mb-1">D（101~500）</div>
+                            <div class="text-cyan-400 font-bold font-mono text-lg">¥100,000<span class="text-xs text-gray-500">/月</span></div>
+                        </div>
+                        <div class="bg-gray-900/50 p-4 rounded border border-gray-700 text-center">
+                            <div class="text-gray-400 text-xs mb-1">E（501~1000）</div>
+                            <div class="text-cyan-400 font-bold font-mono text-lg">¥150,000<span class="text-xs text-gray-500">/月</span></div>
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="bg-gray-800 rounded-xl shadow-2xl overflow-hidden mb-12">
+                    <div class="overflow-x-auto">
+                        <table class="w-full min-w-max text-sm text-center">
+                            <thead class="bg-gray-900 text-xs text-gray-400 uppercase tracking-wider">
+                                <tr>
+                                    <th scope="col" rowspan="2" class="px-6 py-4 text-left">顧客名</th>
+                                    <th scope="col" rowspan="2" class="px-6 py-4">ステータス</th>
+                                    <th scope="col" rowspan="2" class="px-6 py-4">ユースケース</th>
+                                    <th scope="col" rowspan="2" class="px-6 py-4">契約プラン</th>
+                                    <th scope="col" rowspan="2" class="px-6 py-4">開始予定月</th>
+                                    <th scope="col" colspan="3" class="px-6 py-4 border-l border-gray-700">売上シミュレーション (年額)</th>
+                                </tr>
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 border-l border-gray-700 text-xs">本契約金額（確定）</th>
+                                    <th scope="col" class="px-6 py-3 text-xs">トライアル（100%試算）</th>
+                                    <th scope="col" class="px-6 py-3 text-xs">トライアル（50%試算）</th>
+                                </tr>
+                            </thead>
+                            <!-- IDを民間企業用に変更: customer-list-body-private -->
+                            <tbody class="divide-y divide-gray-700" id="customer-list-body-private">
+                                <!-- ... existing private list rows ... -->
+                                <!-- スパルタ英会話 -->
+                                <tr class="hover:bg-gray-700/50 transition-colors duration-200" data-plan="D（101~500）">
+                                    <td class="px-6 py-4 text-left font-semibold text-white">スパルタ英会話</td>
+                                    <td class="px-6 py-4"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-900/50 text-yellow-300">トライアル</span></td>
+                                    <td class="px-6 py-4 text-left">語学</td>
+                                    <td class="px-6 py-4">D（101~500）</td>
+                                    <td class="px-6 py-4">
+                                        <select class="start-month-select bg-gray-800 border border-gray-600 text-white text-xs rounded p-1">
+                                            <option value="12" selected>2025/4 (12ヶ月)</option>
+                                            <option value="11">2025/5 (11ヶ月)</option>
+                                            <option value="10">2025/6 (10ヶ月)</option>
+                                            <option value="9">2025/7 (9ヶ月)</option>
+                                            <option value="8">2025/8 (8ヶ月)</option>
+                                            <option value="7">2025/9 (7ヶ月)</option>
+                                            <option value="6">2025/10 (6ヶ月)</option>
+                                            <option value="5">2025/11 (5ヶ月)</option>
+                                            <option value="4">2025/12 (4ヶ月)</option>
+                                            <option value="3">2026/1 (3ヶ月)</option>
+                                            <option value="2">2026/2 (2ヶ月)</option>
+                                            <option value="1">2026/3 (1ヶ月)</option>
+                                        </select>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono border-l border-gray-700 bg-yellow-900/30">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="0">
+                                            <span>¥0</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono bg-yellow-900/30">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="0">
+                                            <span class="simulation-100">¥0</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono bg-yellow-900/30">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="0">
+                                            <span class="simulation-50">¥0</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- E-NAKA 英語専門塾 イーナカ -->
+                                <tr class="hover:bg-gray-700/50 transition-colors duration-200" data-plan="B（21~50）">
+                                    <td class="px-6 py-4 text-left font-semibold text-white">E-NAKA 英語専門塾 イーナカ</td>
+                                    <td class="px-6 py-4"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-900/50 text-yellow-300">トライアル</span></td>
+                                    <td class="px-6 py-4 text-left">語学</td>
+                                    <td class="px-6 py-4">B（21~50）</td>
+                                    <td class="px-6 py-4">
+                                        <select class="start-month-select bg-gray-800 border border-gray-600 text-white text-xs rounded p-1">
+                                            <option value="12" selected>2025/4 (12ヶ月)</option>
+                                            <option value="11">2025/5 (11ヶ月)</option>
+                                            <option value="10">2025/6 (10ヶ月)</option>
+                                            <option value="9">2025/7 (9ヶ月)</option>
+                                            <option value="8">2025/8 (8ヶ月)</option>
+                                            <option value="7">2025/9 (7ヶ月)</option>
+                                            <option value="6">2025/10 (6ヶ月)</option>
+                                            <option value="5">2025/11 (5ヶ月)</option>
+                                            <option value="4">2025/12 (4ヶ月)</option>
+                                            <option value="3">2026/1 (3ヶ月)</option>
+                                            <option value="2">2026/2 (2ヶ月)</option>
+                                            <option value="1">2026/3 (1ヶ月)</option>
+                                        </select>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono border-l border-gray-700 bg-yellow-900/30">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="0">
+                                            <span>¥0</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono bg-yellow-900/30">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="0">
+                                            <span class="simulation-100">¥0</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono bg-yellow-900/30">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="0">
+                                            <span class="simulation-50">¥0</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- Hiroki English -->
+                                <tr class="hover:bg-gray-700/50 transition-colors duration-200" data-plan="A（~20）">
+                                    <td class="px-6 py-4 text-left font-semibold text-white">Hiroki English</td>
+                                    <td class="px-6 py-4"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-900/50 text-yellow-300">トライアル</span></td>
+                                    <td class="px-6 py-4 text-left">語学</td>
+                                    <td class="px-6 py-4">A（~20）</td>
+                                    <td class="px-6 py-4">
+                                        <select class="start-month-select bg-gray-800 border border-gray-600 text-white text-xs rounded p-1">
+                                            <option value="12" selected>2025/4 (12ヶ月)</option>
+                                            <option value="11">2025/5 (11ヶ月)</option>
+                                            <option value="10">2025/6 (10ヶ月)</option>
+                                            <option value="9">2025/7 (9ヶ月)</option>
+                                            <option value="8">2025/8 (8ヶ月)</option>
+                                            <option value="7">2025/9 (7ヶ月)</option>
+                                            <option value="6">2025/10 (6ヶ月)</option>
+                                            <option value="5">2025/11 (5ヶ月)</option>
+                                            <option value="4">2025/12 (4ヶ月)</option>
+                                            <option value="3">2026/1 (3ヶ月)</option>
+                                            <option value="2">2026/2 (2ヶ月)</option>
+                                            <option value="1">2026/3 (1ヶ月)</option>
+                                        </select>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono border-l border-gray-700 bg-yellow-900/30">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="0">
+                                            <span>¥0</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono bg-yellow-900/30">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="0">
+                                            <span class="simulation-100">¥0</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono bg-yellow-900/30">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="0">
+                                            <span class="simulation-50">¥0</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- Teach you America -->
+                                <tr class="hover:bg-gray-700/50 transition-colors duration-200" data-plan="A（~20）">
+                                    <td class="px-6 py-4 text-left font-semibold text-white">Teach you America</td>
+                                    <td class="px-6 py-4"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-900/50 text-yellow-300">トライアル</span></td>
+                                    <td class="px-6 py-4 text-left">語学</td>
+                                    <td class="px-6 py-4">A（~20）</td>
+                                    <td class="px-6 py-4">
+                                        <select class="start-month-select bg-gray-800 border border-gray-600 text-white text-xs rounded p-1">
+                                            <option value="12" selected>2025/4 (12ヶ月)</option>
+                                            <option value="11">2025/5 (11ヶ月)</option>
+                                            <option value="10">2025/6 (10ヶ月)</option>
+                                            <option value="9">2025/7 (9ヶ月)</option>
+                                            <option value="8">2025/8 (8ヶ月)</option>
+                                            <option value="7">2025/9 (7ヶ月)</option>
+                                            <option value="6">2025/10 (6ヶ月)</option>
+                                            <option value="5">2025/11 (5ヶ月)</option>
+                                            <option value="4">2025/12 (4ヶ月)</option>
+                                            <option value="3">2026/1 (3ヶ月)</option>
+                                            <option value="2">2026/2 (2ヶ月)</option>
+                                            <option value="1">2026/3 (1ヶ月)</option>
+                                        </select>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono border-l border-gray-700 bg-yellow-900/30">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="0">
+                                            <span>¥0</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono bg-yellow-900/30">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="0">
+                                            <span class="simulation-100">¥0</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono bg-yellow-900/30">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="0">
+                                            <span class="simulation-50">¥0</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- STRIX総合型A選抜オンライン塾 -->
+                                <tr class="hover:bg-gray-700/50 transition-colors duration-200" data-plan="A（~20）">
+                                    <td class="px-6 py-4 text-left font-semibold text-white">STRIX総合型A選抜オンライン塾</td>
+                                    <td class="px-6 py-4"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-900/50 text-yellow-300">トライアル</span></td>
+                                    <td class="px-6 py-4 text-left">キャリア</td>
+                                    <td class="px-6 py-4">A（~20）</td>
+                                    <td class="px-6 py-4">
+                                        <select class="start-month-select bg-gray-800 border border-gray-600 text-white text-xs rounded p-1">
+                                            <option value="12" selected>2025/4 (12ヶ月)</option>
+                                            <option value="11">2025/5 (11ヶ月)</option>
+                                            <option value="10">2025/6 (10ヶ月)</option>
+                                            <option value="9">2025/7 (9ヶ月)</option>
+                                            <option value="8">2025/8 (8ヶ月)</option>
+                                            <option value="7">2025/9 (7ヶ月)</option>
+                                            <option value="6">2025/10 (6ヶ月)</option>
+                                            <option value="5">2025/11 (5ヶ月)</option>
+                                            <option value="4">2025/12 (4ヶ月)</option>
+                                            <option value="3">2026/1 (3ヶ月)</option>
+                                            <option value="2">2026/2 (2ヶ月)</option>
+                                            <option value="1">2026/3 (1ヶ月)</option>
+                                        </select>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono border-l border-gray-700 bg-yellow-900/30">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="0">
+                                            <span>¥0</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono bg-yellow-900/30">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="0">
+                                            <span class="simulation-100">¥0</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono bg-yellow-900/30">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="0">
+                                            <span class="simulation-50">¥0</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- リバーシティイングリッシュスクール -->
+                                <tr class="hover:bg-gray-700/50 transition-colors duration-200" data-plan="C（51~100）">
+                                    <td class="px-6 py-4 text-left font-semibold text-white">リバーシティイングリッシュスクール</td>
+                                    <td class="px-6 py-4"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-900/50 text-yellow-300">トライアル</span></td>
+                                    <td class="px-6 py-4 text-left">語学</td>
+                                    <td class="px-6 py-4">C（51~100）</td>
+                                    <td class="px-6 py-4">
+                                        <select class="start-month-select bg-gray-800 border border-gray-600 text-white text-xs rounded p-1">
+                                            <option value="12" selected>2025/4 (12ヶ月)</option>
+                                            <option value="11">2025/5 (11ヶ月)</option>
+                                            <option value="10">2025/6 (10ヶ月)</option>
+                                            <option value="9">2025/7 (9ヶ月)</option>
+                                            <option value="8">2025/8 (8ヶ月)</option>
+                                            <option value="7">2025/9 (7ヶ月)</option>
+                                            <option value="6">2025/10 (6ヶ月)</option>
+                                            <option value="5">2025/11 (5ヶ月)</option>
+                                            <option value="4">2025/12 (4ヶ月)</option>
+                                            <option value="3">2026/1 (3ヶ月)</option>
+                                            <option value="2">2026/2 (2ヶ月)</option>
+                                            <option value="1">2026/3 (1ヶ月)</option>
+                                        </select>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono border-l border-gray-700 bg-yellow-900/30">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="0">
+                                            <span>¥0</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono bg-yellow-900/30">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="0">
+                                            <span class="simulation-100">¥0</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 font-mono bg-yellow-900/30">
+                                        <div class="flex items-center justify-center gap-x-2">
+                                            <input type="checkbox" class="amount-checkbox h-5 w-5 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500" data-amount="0">
+                                            <span class="simulation-50">¥0</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot class="bg-gray-900">
+                                <tr>
+                                    <th scope="row" colspan="5" class="px-6 py-4 text-right font-bold text-white uppercase">合計金額</th>
+                                    <td class="px-6 py-4 font-mono font-bold text-lg text-white border-l border-gray-700 bg-green-900/30">¥0</td>
+                                    <td class="px-6 py-4 font-mono font-bold text-lg text-white bg-yellow-900/30">¥2,460,000</td>
+                                    <td class="px-6 py-4 font-mono font-bold text-lg text-white bg-yellow-900/30">¥1,230,000</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <!-- 合計カウンター (民間企業) -->
+                    <div class="mt-6 px-6 py-4 bg-gray-900/50 rounded-lg flex flex-wrap items-center justify-between gap-4">
+                        <div class="flex flex-wrap gap-4">
+                            <!-- ID変更: calculate-button-private -->
+                            <button id="calculate-button-private" class="calculate-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg transition-colors duration-200 shadow-lg shadow-blue-500/20" data-target="view-private">
+                                選択した項目を合計 (民間企業)
+                            </button>
+                            <button id="reset-button-private" class="reset-btn bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-5 rounded-lg transition-colors duration-200 shadow-lg shadow-gray-500/20" data-target="view-private">
+                                選択を解除
+                            </button>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-sm text-gray-400 uppercase">選択項目 合計金額</span>
+                            <!-- ID変更: grand-total-private -->
+                            <p id="grand-total-private" class="font-mono font-bold text-2xl text-cyan-400">¥0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // ==========================================
+            // ビュー切り替えロジック
+            // ==========================================
+            const viewSelector = document.getElementById('view-selector');
+            const viewPublic = document.getElementById('view-public');
+            const viewPrivate = document.getElementById('view-private');
+
+            viewSelector.addEventListener('change', (e) => {
+                const selectedView = e.target.value;
+                if (selectedView === 'public') {
+                    viewPublic.classList.remove('hidden');
+                    viewPrivate.classList.add('hidden');
+                } else if (selectedView === 'private') {
+                    viewPublic.classList.add('hidden');
+                    viewPrivate.classList.remove('hidden');
+                }
+            });
+
+            // ==========================================
+            // 計算ロジック (汎用化)
+            // ==========================================
+            const calculateButtons = document.querySelectorAll('.calculate-btn');
+            const resetButtons = document.querySelectorAll('.reset-btn');
+            
+            // 数値を通貨文字列にフォーマットするヘルパー関数
+            const formatCurrency = (number) => {
+                return new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(number);
+            };
+
+            const calculateTotal = (targetViewId) => {
+                const targetView = document.getElementById(targetViewId);
+                if (!targetView) return;
+
+                const amountCheckboxes = targetView.querySelectorAll('.amount-checkbox');
+                let grandTotalEl;
+                if (targetViewId === 'view-public') {
+                    grandTotalEl = document.getElementById('grand-total-public');
+                } else {
+                    grandTotalEl = document.getElementById('grand-total-private');
+                }
+
+                let grandTotal = 0;
+
+                amountCheckboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        const amount = parseInt(checkbox.dataset.amount, 10);
+                        if (!isNaN(amount)) {
+                            grandTotal += amount;
+                        }
+                    }
+                });
+
+                if (grandTotalEl) {
+                    grandTotalEl.textContent = formatCurrency(grandTotal);
+                }
+            };
+
+            const resetSelection = (targetViewId) => {
+                const targetView = document.getElementById(targetViewId);
+                if (!targetView) return;
+
+                const amountCheckboxes = targetView.querySelectorAll('.amount-checkbox');
+                amountCheckboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+
+                // 合計を再計算（0にする）
+                calculateTotal(targetViewId);
+            };
+
+            calculateButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const targetViewId = e.target.dataset.target;
+                    calculateTotal(targetViewId);
+                });
+            });
+
+            resetButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const targetViewId = e.target.dataset.target;
+                    resetSelection(targetViewId);
+                });
+            });
+
+            // ==========================================
+            // 民間企業向け シミュレーション計算ロジック
+            // ==========================================
+            const PLAN_PRICES = {
+                'A（~20）': 10000,
+                'A': 10000,
+                'B（21~50）': 25000,
+                'C（51~100）': 50000,
+                'D（101~500）': 100000,
+                'E（501~1000）': 150000
+            };
+
+            const privateTableBody = document.getElementById('customer-list-body-private');
+            if (privateTableBody) {
+                const rows = privateTableBody.querySelectorAll('tr');
+
+                // 行ごとの計算処理
+                const updateRowCalculation = (row) => {
+                    const plan = row.dataset.plan;
+                    const monthlyPrice = PLAN_PRICES[plan] || 0;
+                    
+                    const select = row.querySelector('.start-month-select');
+                    const months = parseInt(select.value, 10);
+
+                    if (!monthlyPrice || !months) return;
+
+                    // 計算
+                    const total100 = monthlyPrice * months;
+                    const total50 = Math.floor(total100 * 0.5);
+
+                    // DOM更新 (100%)
+                    const sim100El = row.querySelector('.simulation-100');
+                    const checkbox100 = sim100El.previousElementSibling; // 直前のinput
+                    if (sim100El && checkbox100) {
+                        sim100El.textContent = formatCurrency(total100);
+                        checkbox100.dataset.amount = total100;
+                    }
+
+                    // DOM更新 (50%)
+                    const sim50El = row.querySelector('.simulation-50');
+                    const checkbox50 = sim50El.previousElementSibling;
+                    if (sim50El && checkbox50) {
+                        sim50El.textContent = formatCurrency(total50);
+                        checkbox50.dataset.amount = total50;
+                    }
+                };
+
+                // 初期計算実行
+                rows.forEach(row => {
+                    updateRowCalculation(row);
+                    
+                    // セレクトボックス変更イベント
+                    const select = row.querySelector('.start-month-select');
+                    if (select) {
+                        select.addEventListener('change', () => {
+                            updateRowCalculation(row);
+                            // 値が変わったら合計も再計算（もしチェックされていれば）
+                            calculateTotal('view-private');
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>
